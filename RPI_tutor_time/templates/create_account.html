@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Create an Account</title>
+        <style type="text/css">
+            p.spacer {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <p>Account Creation Page</p>
+        <form method="POST" action="/create_account/">{% csrf_token %}
+           <p><label>First name</label> <input name="fname" type="text" /></p>
+           <p><label>Last name</label> <input name="lname" type="text" /></p>
+           <p><label>Username</label> <input name="username" type="text" /></p>
+           <p><label>Password</label> <input name="password" type="password" /></p>
+           <p><label>Password (confirm)</label> <input name="pwconfirm" type="password" /></p>
+           <p><label>Email</label> <input name="email" type="text" /></p>
+           <p><input type="submit" value="Create Account" /></p>
+        </form>
+    </body>
+
+</html>
