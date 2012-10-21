@@ -26,3 +26,4 @@ def create_account(request):
         c = {}
         c.update(csrf(request))
         return render_to_response('create_account.html',c)
+

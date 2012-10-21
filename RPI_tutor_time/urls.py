@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import patterns, include, url
 
+
 import tutor_time.views
+import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -15,6 +17,7 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     #url(r'^create_account/', include('tutor_time.urls')),
     url(r'^create_account/', tutor_time.views.create_account),
+    url(r'^login/', django.contrib.auth.views.login, {'template_name': 'login.html'}),
     url(r'^$', tutor_time.views.index),
 
     # Uncomment the next line to enable the admin:
