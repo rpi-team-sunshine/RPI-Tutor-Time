@@ -1,11 +1,21 @@
 <html>
 
     <head>
-        <title>RPI Tutor Time</title>
+        <title>Claim Tutee</title>
+		<style type="text/css">
+			p.spacer {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		</style>
     </head>
 
     <body>
         <p>Claim a Tutee!</p>
+		<form method="POST" action="/claim_tutee/">{% csrf_token %}
+			<p><label> Tutee </label> <label> Class </label> <label> Times </label> 
+			<input type="submit" value="Claim Them!" />
+		</form>
     </body>
 
 </html>
