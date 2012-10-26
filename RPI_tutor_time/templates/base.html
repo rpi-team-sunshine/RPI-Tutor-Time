@@ -2,15 +2,17 @@
 <html lang="en">
     <head>
         <title>RPI Tutor Time</title>
-        <link href="alpha.css" rel="stylesheet">
+        {% load static %}
+        {% get_static_prefix as STATIC_PREFIX %}
+
+        <link href="{{ STATIC_PREFIX }}css/base.css" rel="stylesheet">
         <style type="text/css">
-           #HEADER{width:100%;height:250px;background-color:RED;} 
         </style>
     </head>
 
     <body>
         <div id="HEADER">
-            <a id="TITLE">RPI Tutor Time</a>
+            <div id="HEADERTITLE">RPI Tutor Time</div>
         </div>
         {% block content %}
         {% endblock %}

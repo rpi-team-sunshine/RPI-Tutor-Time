@@ -1,4 +1,5 @@
 # Django settings for RPI_tutor_time project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -34,6 +35,7 @@ TIME_ZONE = None
 LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -72,6 +74,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(SITE_ROOT, 'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -106,7 +109,9 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/tchestna/School/Team-Sunshine/RPI_tutor_time/templates'
+    #'/home/tchestna/School/Team-Sunshine/RPI_tutor_time/templates'
+    os.path.join(SITE_ROOT, 'templates')
+
 )
 
 INSTALLED_APPS = (
