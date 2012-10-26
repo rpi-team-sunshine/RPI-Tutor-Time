@@ -1,2 +1,10 @@
-#HEADER{width:100%;height:50px;background-color:RED;}
-#HEADERTITLE{font-size:40px;font-weight:bold;}
+#HEADER{width:100%;height:50px;background-color:RED;display:block;}
+#HEADERTITLE{font-size:40px;font-weight:bold;width:350px;display:inline-block;}
+body{height:100%;width:100%}
+#LOGIN{float:right;}
+.input_field{width:200px; overflow:hidden; display:inline-block;}
+#LOGIN label{font-weight:bold;}
+#LOGIN input{border: 1px solid black; width:200px;}
+#LOGGEDIN {float:right; width:250px;}
+#LOGGEDIN span{display:block;font-weight:bold;}
+#LOGGEDIN input{border: 1px solid black; float:right;}

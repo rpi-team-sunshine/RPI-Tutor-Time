@@ -4,10 +4,12 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
-from pprint import pprint
+from django.contrib.auth import logout 
 
 def index(request):
-    return render_to_response('index.html')
+    context = RequestContext(request) 
+    context.update(csrf(request))
+    return render_to_response('index.html', context)
 
 def create_account(request):
     if request.method == 'POST':
@@ -27,3 +29,6 @@ def create_account(request):
         c.update(csrf(request))
         return render_to_response('create_account.html',c)
 
+def logout_view(request):
+    logout(request)
+    return index(request)

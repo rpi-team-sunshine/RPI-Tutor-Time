@@ -13,6 +13,29 @@
     <body>
         <div id="HEADER">
             <div id="HEADERTITLE">RPI Tutor Time</div>
+            {% if user.is_authenticated %}
+                <div id="LOGGEDIN" style="display:inline-block;">
+                    <span> Logged in as: {{ user.username }} </span>
+                    <form method="post" action="/logout/">
+                        {% csrf_token %}
+                        <div class="input_field"><input type="submit" value="logout" /></div>
+                    </form>
+                </div>
+            {% else %}
+                <div id="LOGIN">
+                    <form method="post" action="{% url django.contrib.auth.views.login %}">
+                        {% csrf_token %}
+                        <div class="input_field">
+                            <label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="30" />
+                        </div>
+                        <div class="input_field">
+                            <label for="id_password">Password:</label> <input type="password" name="password" id="id_password" />
+                        </div>
+                        <div class="input_field"><input type="submit" value="login" /></div>
+                    </form>
+                </div>
+            {% endif %}
+
         </div>
         {% block content %}
         {% endblock %}
