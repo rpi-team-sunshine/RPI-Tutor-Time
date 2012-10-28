@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Claim Tutee</title>
+		<style type="text/css">
+			p.spacer {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		</style>
+    </head>
+
+    <body>
+        <p>Claim a Tutee!</p>
+		<ul>
+		{% for tutee in tutee_list %}
+			<p><li>{{ tutee.user.first_name }}</li><label> Class: </label></p>
+            <p><label> Availability: </label></p>
+            <p><input type="submit" value="Claim Them!"/></p>
+        {% empty %}
+            <li>There are no tutees in the list</li>
+		{% endfor %}
+		</ul>
+    </body>
+
+</html>
