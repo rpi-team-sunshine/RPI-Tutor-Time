@@ -42,7 +42,9 @@ def create_account(request):
 
         t = Tutee(user=useracct)
         t.save()
-        return render_to_response('index.html')
+        c.update(csrf(request))
+        return render_to_response('index.html',
+                                  context_instance=RequestContext(request, c))
     else:
         c.update(csrf(request))
         return render_to_response('create_account.html',
