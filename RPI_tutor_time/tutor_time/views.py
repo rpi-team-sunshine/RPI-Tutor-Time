@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from tutor_time.models import Tutee, Tutor
 from tutor_time.utility import *
 
 def index(request):
@@ -29,11 +30,14 @@ def create_account(request):
             c.update(csrf(request))
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
-        user = User.objects.create_user(username,email,password)
-        user.first_name = fname
-        user.last_name = lname
-        user.is_staff = False
-        user.save()
+        useracct = User.objects.create_user(username,email,password)
+        useracct.first_name = fname
+        useracct.last_name = lname
+        useracct.is_staff = False
+        #useracct.save()
+
+        t = Tutee(user=useracct)
+        t.save()
         return render_to_response('index.html')
     else:
         c.update(csrf(request))
