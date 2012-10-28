@@ -6,20 +6,51 @@
                 margin-top: 0;
                 margin-bottom: 0;
             }
+            .errortext {
+                color: #FF0000;
+                font-weight: bold;
+            }
         </style>
+
     </head>
 
     <body>
-        <p>Account Creation Page</p>
-        <form method="POST" action="/create_account/">{% csrf_token %}
-           <p><label>First name</label> <input name="fname" type="text" /></p>
-           <p><label>Last name</label> <input name="lname" type="text" /></p>
-           <p><label>Username</label> <input name="username" type="text" /></p>
-           <p><label>Password</label> <input name="password" type="password" /></p>
-           <p><label>Password (confirm)</label> <input name="pwconfirm" type="password" /></p>
-           <p><label>Email</label> <input name="email" type="text" /></p>
-           <p><input type="submit" value="Create Account" /></p>
-        </form>
+        <fieldset>
+            <legend>Account Creation Page</legend>
+            <form method="POST" action="/create_account/">{% csrf_token %}
+               {{ password_error }}
+               <p>
+                   <label>First name</label> <input name="fname" type="text" />
+               </p>
+
+               <p>
+                   <label>Last name</label> <input name="lname" type="text" />
+               </p>
+
+               <p>
+                   <label>Username</label> <input name="username" type="text" /> (must start with a letter. Lowercase and numbers only)
+                   <span class="errortext">{{ username_error }}</span>
+               </p>
+
+               <p>
+                   <label>Password</label> <input name="password" type="password" /> (at least six characters)
+                   <span class="errortext">{{ password_error }}</span>
+               </p>
+
+               <p>
+                   <label>Password (confirm)</label> <input name="pwconfirm" type="password" />
+               </p>
+
+               <p>
+                   <label>Email</label> <input name="email" type="text" /> (must be an rpi email)
+                   <span class="errortext">{{ email_error }}</span>
+               </p>
+
+               <p>
+                   <input type="submit" value="Create Account" />
+               </p>
+            </form>
+        </fieldset>
     </body>
 
 </html>
