@@ -28,4 +28,5 @@ def create_account(request):
         return render_to_response('create_account.html',c)
 		
 def claim_tutee(request):
-	return render_to_response('claim_tutee.html')
+    tutee_list = User.objects.all()
+    return render_to_response('claim_tutee.html', tutee_list)

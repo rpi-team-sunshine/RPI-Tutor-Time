@@ -1,5 +1,4 @@
 <html>
-
     <head>
         <title>Claim Tutee</title>
 		<style type="text/css">
@@ -12,10 +11,17 @@
 
     <body>
         <p>Claim a Tutee!</p>
-		<form method="POST" action="/claim_tutee/">{% csrf_token %}
+		<form method="POST" action="/claim_tutee/">
 			<p><label> Tutee </label> <label> Class </label> <label> Times </label> 
 			<input type="submit" value="Claim Them!" />
 		</form>
+		<ul>
+		{% for tutee in tutee_list %}
+			<li>{{ tutee }}</li>
+        {% empty %}
+            <li>There are no tutees in the list</li>
+		{% endfor %}
+		</ul>
     </body>
 
 </html>

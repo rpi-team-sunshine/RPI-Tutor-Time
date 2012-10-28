@@ -107,6 +107,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     #'/home/apd3691/rpi/SDD/RPI-Tutor-Time/RPI_tutor_time/templates'
+    '/home/sheena/Code/SDD/RPI-Tutor-Time/RPI_tutor_time/templates'
 )
 
 INSTALLED_APPS = (
