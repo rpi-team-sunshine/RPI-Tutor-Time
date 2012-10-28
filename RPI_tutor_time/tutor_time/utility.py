@@ -1,4 +1,5 @@
 import re
+from tutor_time.models import *
 
 def validate_creation(username, password, pwconfirm, email):
     errors = {}
@@ -24,3 +25,12 @@ def validate_creation(username, password, pwconfirm, email):
 
     # No errors
     return None
+
+def promote_user(user_obj):
+    """
+    Given a User object, creates and returns a Tutor
+    """
+    tutor = Tutor(tutee_ptr=user_obj.get_profile())
+    tutor.__dict__.update(user_obj.get_profile().__dict__)
+    tutor.save()
+    return tutor
