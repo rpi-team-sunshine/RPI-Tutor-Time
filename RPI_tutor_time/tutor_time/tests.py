@@ -7,10 +7,31 @@ Replace this with more appropriate tests for your application.
 
 from django.test import TestCase
 
+class AccountCreationTest(TestCase):
+    def setUp(self):
+        pass
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+    def tearDown(self):
+        pass
+
+    def test_page_load(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that page loads.
         """
-        self.assertEqual(1 + 1, 2)
+        response = self.client.get('/create_account/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_account_success(self):
+        """Not finished"""
+        data = {
+            'username': 'testaccount',
+            'fname': 'John',
+            'lname': 'Doe',
+            'email': 'johndoe@rpi.edu',
+            'password': '123456',
+            'pwconfirm': '123456',
+        }
+
+        self.client.post('/create_account/', data)
+        self.assertEqual(response.status_code, 200)
+
