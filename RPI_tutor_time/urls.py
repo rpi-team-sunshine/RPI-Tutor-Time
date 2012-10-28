@@ -3,8 +3,8 @@ from django.conf.urls.defaults import patterns, include, url
 import tutor_time.views
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
@@ -18,5 +18,5 @@ urlpatterns = patterns('',
     url(r'^$', tutor_time.views.index),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
 )
