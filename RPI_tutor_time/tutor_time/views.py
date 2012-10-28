@@ -34,7 +34,7 @@ def create_account(request):
         useracct.first_name = fname
         useracct.last_name = lname
         useracct.is_staff = False
-        #useracct.save()
+        useracct.save()
 
         t = Tutee(user=useracct)
         t.save()
