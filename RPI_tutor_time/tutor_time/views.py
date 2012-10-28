@@ -29,4 +29,7 @@ def create_account(request):
 		
 def claim_tutee(request):
     tutee_list = User.objects.all()
-    return render_to_response('claim_tutee.html', tutee_list)
+    print tutee_list
+    for tutee in tutee_list:
+        print tutee.username
+    return render_to_response('claim_tutee.html', {'tutee_list': tutee_list})
