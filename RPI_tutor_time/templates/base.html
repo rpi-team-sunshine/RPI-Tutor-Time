@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>RPI Tutor Time</title>
         {% load static %}
         {% get_static_prefix as STATIC_PREFIX %}
 
         <link href="{{ STATIC_PREFIX }}css/base.css" rel="stylesheet">
+        {% block head_section %}
+        {% endblock %}
     </head>
 
     <body>
