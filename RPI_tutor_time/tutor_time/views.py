@@ -4,32 +4,53 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from tutor_time.models import Tutee, Tutor
+from tutor_time.utility import *
 from pprint import pprint
 
 def index(request):
     return render_to_response('index.html')
 
 def create_account(request):
+    c = {
+        'password_error': '',
+        'username_error': '',
+        'email_error': ''
+    }
+
     if request.method == 'POST':
         username = request.POST['username']
         fname = request.POST['fname']
         lname = request.POST['lname']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(username,email,password)
-        user.first_name = fname
-        user.last_name = lname
-        user.is_staff = False
-        user.save()
+        password_confirm = request.POST['pwconfirm']
+        valid = validate_creation(username, password, password_confirm, email)
+        if valid is not None:
+            c.update(valid)
+            c.update(csrf(request))
+            return render_to_response('create_account.html',
+                                      context_instance=RequestContext(request, c))
+        useracct = User.objects.create_user(username,email,password)
+        useracct.first_name = fname
+        useracct.last_name = lname
+        useracct.is_staff = False
+        useracct.save()
+
+        t = Tutee(user=useracct)
+        t.save()
         return render_to_response('index.html')
     else:
-        c = {}
         c.update(csrf(request))
-        return render_to_response('create_account.html',c)
-		
+        return render_to_response('create_account.html',
+                                  context_instance=RequestContext(request, c))
+
+
+
 def claim_tutee(request):
-    tutee_list = User.objects.all()
-    print tutee_list
-    for tutee in tutee_list:
-        print tutee.username
+    tutee_list = Tutee.objects.all()
     return render_to_response('claim_tutee.html', {'tutee_list': tutee_list})
+
+
+
+

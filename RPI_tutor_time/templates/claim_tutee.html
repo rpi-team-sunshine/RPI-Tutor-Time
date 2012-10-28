@@ -13,7 +13,9 @@
         <p>Claim a Tutee!</p>
 		<ul>
 		{% for tutee in tutee_list %}
-			<p><label> Tutee: </label><li>{{ tutee.username }}</li><input type="submit" value="Claim Them!"/>
+			<p><li>{{ tutee.user.first_name }}</li><label> Class: </label></p>
+            <p><label> Availability: </label></p>
+            <p><input type="submit" value="Claim Them!"/></p>
         {% empty %}
             <li>There are no tutees in the list</li>
 		{% endfor %}
