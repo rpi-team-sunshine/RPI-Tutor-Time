@@ -30,6 +30,7 @@ def create_account(request):
             c.update(csrf(request))
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
+
         useracct = User.objects.create_user(username,email,password)
         useracct.first_name = fname
         useracct.last_name = lname
