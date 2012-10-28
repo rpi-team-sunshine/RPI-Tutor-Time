@@ -2,9 +2,11 @@
 #HEADERTITLE{font-size:40px;font-weight:bold;width:350px;display:inline-block;}
 body{height:100%;width:100%}
 #LOGIN{float:right;}
-.input_field{width:200px; overflow:hidden; display:inline-block;}
+#LOGIN .input_field{width:200px; display:inline-block;}
+#LOGIN .input_field.button input {width:50px;}
+#LOGIN .input_field.button {width:50px; padding-right:50px;}
 #LOGIN label{font-weight:bold;}
 #LOGIN input{border: 1px solid black; width:200px;}
 #LOGGEDIN {float:right; width:250px;}
-#LOGGEDIN span{display:block;font-weight:bold;}
+#LOGGEDIN span{display:block; font-weight:bold;}
 #LOGGEDIN input{border: 1px solid black; float:right;}
