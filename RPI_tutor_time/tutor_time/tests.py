@@ -169,7 +169,7 @@ class AccountCreationTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(self.user_exists(data['username']))
 
-    def test_create_account_fail_email4(self):
+    def test_create_account_fail_email5(self):
         """
         Test to make a real account with a email that's not any edu
         """
