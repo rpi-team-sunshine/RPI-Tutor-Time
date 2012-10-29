@@ -1,23 +1,40 @@
 import re
 from tutor_time.models import *
 
-def validate_creation(username, password, pwconfirm, email):
+def validate_creation(info):
     errors = {}
 
+    # Check to make sure things are existing
+    if 'username' not in info or info['username'] == '':
+        errors['username_error'] = 'Username field is empty'
+    if 'password' not in info or info['password'] == '':
+        errors['password_error'] = 'Password field is empty'
+    if 'pwconfirm' not in info or info['pwconfirm'] == '':
+        errors['password_error'] = 'Password confirm field is empty'
+    if 'email' not in info or info['email'] == '':
+        errors['email_error'] = 'Email field is empty'
+    if 'fname' not in info or info['fname'] == '':
+        errors['firstname_error'] = 'First name field is empty'
+    if 'lname' not in info or info['lname'] == '':
+        errors['lastname_error'] = 'Last name field is empty'
+
+    if len(errors) != 0:
+        return errors
+
     # Make sure passwords are the same
-    if password != pwconfirm:
+    if info['password'] != info['pwconfirm']:
         errors['password_error'] = 'Passwords do not match'
 
     # Make sure password is at least 6 characters
-    if len(password) < 6:
+    if len(info['password']) < 6:
         errors['password_error'] = 'Password is too short'
 
     # Make sure username is good
-    if re.match('^[a-z]+[0-9]*$',username) is None:
+    if re.match('^[a-z]+[0-9]*$',info['username']) is None:
         errors['username_error'] = 'Username must be lowercase a-z followed by optional digits'
 
     # Make sure email is from rpi (eventually change to campus .edu email)
-    if re.match('^[a-z]+[0-9]*@rpi\.edu$', email) is None:
+    if re.match('^[a-z]+[0-9]*@rpi\.edu$', info['email']) is None:
         errors['email_error'] = 'E-mail must be an RPI email'
 
     if len(errors) != 0:

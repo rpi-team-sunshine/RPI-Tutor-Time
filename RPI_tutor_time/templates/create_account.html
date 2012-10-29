@@ -18,13 +18,14 @@
     <fieldset>
         <legend>Account Creation Page</legend>
         <form method="POST" action="/create_account/">{% csrf_token %}
-           {{ password_error }}
            <p>
                <label>First name</label> <input name="fname" type="text" />
+               <span class="errortext">{{ firstname_error }}</span>
            </p>
 
            <p>
                <label>Last name</label> <input name="lname" type="text" />
+               <span class="errortext">{{ lastname_error }}</span>
            </p>
 
            <p>
