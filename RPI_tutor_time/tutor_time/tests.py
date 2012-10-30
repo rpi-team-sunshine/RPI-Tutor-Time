@@ -253,3 +253,46 @@ class AccountCreationTest(TestCase):
         response = self.client.post('/create_account/', data)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(self.user_exists(data['username']))
+        
+class AccountLoginTest(TestCase):
+
+    def setUp(self):
+        """
+        Create a user account that can be used for testing authentication.
+        """
+        User.objects.create_user('testington', "alpha@rpi.edu", 'alphabeta')
+
+    def tearDown(self):
+        """
+        Should delete account but Django does not make it easy.
+        Not worth the effort to figure out.
+        """
+        pass
+
+    def not_logged_in(self):
+        """
+        Make sure no one is initially logged in
+        """
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue( "LOGIN" in response.content )
+
+    def log_in(self):
+        self.client.login(username='testington', password='alphabeta')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue( 'testington' in response.content )
+        
+    def log_out(self):
+        """Logout testington"""
+        response = self.client.post('/logout/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue( "LOGIN" in response.content )
+
+    def test_login(self):
+        """
+        Test login logout flow
+        """
+        self.not_logged_in()
+        self.log_in()
+        self.log_out()
