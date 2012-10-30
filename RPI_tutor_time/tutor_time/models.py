@@ -14,7 +14,7 @@ class Tutor(Tutee):
 
 
 class Request(models.Model):
-    request_by = models.CharField(max_length=30)
+    user = models.OneToOneField(User)
     accepted_by = models.CharField(max_length=30, null=True)
     for_class = models.CharField(max_length=30)
     description = models.CharField(max_length=300, null=True)
@@ -37,3 +37,7 @@ class Request(models.Model):
     days = models.CharField(max_length=2, choices=DAYS_CHOICES)
     time = models.TimeField()
 
+#class TutorTueePairs(models.Model):
+    #user1 = models.OneToOneField(User)  #tutee
+    #user2 = models.OneToOneField(User)  #tutor
+# This is probably a better way to di it, but I was getting tons of errors from syncdb

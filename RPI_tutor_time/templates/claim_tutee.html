@@ -11,14 +11,20 @@
 {% endblock %}
 
 {% block content %}
-    <p>Claim a Tutee!</p>
-	<ul>
-	{% for tutee in tutee_list %}
-		<p><li>{{ tutee.user.first_name }}</li><label> Class: </label></p>
-        <p><label> Availability: </label></p>
-        <p><input type="submit" value="Claim Them!"/></p>
-    {% empty %}
-        <li>There are no tutees in the list</li>
-	{% endfor %}
-	</ul>
+    <fieldset>
+        <legend>Claim a Tutee!</legend>
+        <form method="POST" action="/claim_tutee/">{% csrf_token %}
+            {% for req in help_requests %}
+                <p><li>{{ req.user.first_name }} {{ req.user.last_name }}</li>
+                <p><label> Class: </label><label>{{ req.for_class }}</label></p>
+                <p><label> Description: </label><label>{{ req.description }}</label></p>
+                <p><label> Availability: </label><label>{{ req.days }} {{ req.time }}</label></p>
+                <p><input type="radio" name="choice" id="{{ req.user.username }}" value="{{ req.user.username }}" />
+                <label for="{{ req.user.username }}">Claim This Tutee</label></p>
+            {% empty %}
+                <li>There are no tutees in the list</li>
+            {% endfor %}
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
 {% endblock %}
