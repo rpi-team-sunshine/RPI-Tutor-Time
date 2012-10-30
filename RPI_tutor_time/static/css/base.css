@@ -1,5 +1,5 @@
 #HEADER{width:100%;height:50px;background-color:RED;display:block;}
-#HEADERTITLE{font-size:40px;font-weight:bold;width:350px;display:inline-block;}
+#HEADERTITLE{font-size:40px;font-weight:bold;width:350px;display:inline-block;margin-left:15px;}
 body{height:100%;width:100%}
 #LOGIN{float:right;}
 #LOGIN .input_field{width:200px; display:inline-block;}
@@ -9,4 +9,4 @@ body{height:100%;width:100%}
 #LOGIN input{border: 1px solid black; width:200px;}
 #LOGGEDIN {float:right; width:250px;}
 #LOGGEDIN span{display:block; font-weight:bold;}
-#LOGGEDIN input{border: 1px solid black; float:right;}
+#LOGGEDIN input{border: 1px solid black; float:right; margin-right:20px;}
