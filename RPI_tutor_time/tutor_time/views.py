@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth import logout 
-from tutor_time.models import Tutee, Tutor
+from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 
 def index(request):
@@ -55,7 +55,55 @@ def logout_view(request):
 
 
 def claim_tutee(request):
-    tutee_list = Tutee.objects.all()
-    return render_to_response('claim_tutee.html', {'tutee_list': tutee_list})
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        print 'A CLAIM HAS OCCURED'
+        print 'requester: ', request.POST['choice']
+        print 'claimer: ', c['user'].username
+        requests = Request.objects.all()
+        for req in requests:
+            if req.user.username == request.POST['choice']:
+                req.accepted_by = c['user'].username
+                req.save()
+        c.update(csrf(request))
+        return render_to_response('claim_tutee.html', c)
+    else:
+        c.update(csrf(request))
+        tutee_list = Tutee.objects.all()
+        for x in tutee_list:
+            print 'tutee: ', x.user.username
+        requests = Request.objects.all()
+        for y in requests:
+            print 'requester: ', y.user.username
+            print 'accepted_by: ', y.accepted_by
+        help_requests = []
+        for tutee in tutee_list:
+            for req in requests:
+                if tutee.user.username == req.user.username and req.user.username != c['user'].username:
+                    if not req.accepted_by:
+                        help_requests.append(req)
+ 
+        c.update(csrf(request))
+        c.update({'help_requests': help_requests})
+        return render_to_response('claim_tutee.html', c)
 
+def request_help(request):
+    c = RequestContext(request)
+    print c['user'].first_name
+    requests = Request.objects.all()
+    for req in requests:
+        print 'Request: ', req.user, req.for_class, req.description, req.days, req.time
+    if request.method == 'POST':
+        fc = request.POST['for_class']
+        desc = request.POST['description']
+        d = request.POST['day']
+        t = request.POST['time']
 
+        helprequest = Request(user=c['user'], for_class=fc, description=desc, days=d, time=t)
+        helprequest.save()
+        return render_to_response('request_help.html', c)
+    else:
+        c = {}
+        c.update(csrf(request))
+        return render_to_response('request_help.html', c)
