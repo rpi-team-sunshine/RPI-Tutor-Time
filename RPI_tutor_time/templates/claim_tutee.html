@@ -15,12 +15,12 @@
         <legend>Claim a Tutee!</legend>
         <form method="POST" action="/claim_tutee/">{% csrf_token %}
             {% for req in help_requests %}
-                <p><li>{{ req.user.first_name }} {{ req.user.last_name }}</li>
+                <p><li>{{ req.first_name }} {{ req.last_name }}</li>
                 <p><label> Class: </label><label>{{ req.for_class }}</label></p>
                 <p><label> Description: </label><label>{{ req.description }}</label></p>
                 <p><label> Availability: </label><label>{{ req.days }} {{ req.time }}</label></p>
-                <p><input type="radio" name="choice" id="{{ req.user.username }}" value="{{ req.user.username }}" />
-                <label for="{{ req.user.username }}">Claim This Tutee</label></p>
+                <p><input type="radio" name="choice" id="{{ req.user }}?^?{{ req.id }}" value="{{ req.user }}?^?{{ req.id }}" />
+                <label for="{{ req.user }}">Claim This Tutee</label></p>
             {% empty %}
                 <li>There are no tutees in the list</li>
             {% endfor %}

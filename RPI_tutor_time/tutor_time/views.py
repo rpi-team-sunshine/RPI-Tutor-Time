@@ -58,29 +58,23 @@ def claim_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
     if request.method == 'POST':
-        print 'A CLAIM HAS OCCURED'
-        print 'requester: ', request.POST['choice']
-        print 'claimer: ', c['user'].username
+        request_user_and_id = request.POST['choice'].split('?^?')
         requests = Request.objects.all()
         for req in requests:
-            if req.user.username == request.POST['choice']:
-                req.accepted_by = c['user'].username
-                req.save()
+            if req.user == request_user_and_id[0]:
+                if req.id == int(request_user_and_id[1]):
+                    req.accepted_by = c['user'].username
+                    req.save()
         c.update(csrf(request))
         return render_to_response('claim_tutee.html', c)
     else:
         c.update(csrf(request))
         tutee_list = Tutee.objects.all()
-        for x in tutee_list:
-            print 'tutee: ', x.user.username
         requests = Request.objects.all()
-        for y in requests:
-            print 'requester: ', y.user.username
-            print 'accepted_by: ', y.accepted_by
         help_requests = []
         for tutee in tutee_list:
             for req in requests:
-                if tutee.user.username == req.user.username and req.user.username != c['user'].username:
+                if tutee.user.username == req.user and req.user != c['user'].username:
                     if not req.accepted_by:
                         help_requests.append(req)
  
@@ -88,19 +82,17 @@ def claim_tutee(request):
         c.update({'help_requests': help_requests})
         return render_to_response('claim_tutee.html', c)
 
+
 def request_help(request):
     c = RequestContext(request)
-    print c['user'].first_name
     requests = Request.objects.all()
     for req in requests:
-        print 'Request: ', req.user, req.for_class, req.description, req.days, req.time
     if request.method == 'POST':
         fc = request.POST['for_class']
         desc = request.POST['description']
         d = request.POST['day']
         t = request.POST['time']
-
-        helprequest = Request(user=c['user'], for_class=fc, description=desc, days=d, time=t)
+        helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
         helprequest.save()
         return render_to_response('request_help.html', c)
     else:

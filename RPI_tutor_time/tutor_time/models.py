@@ -14,7 +14,10 @@ class Tutor(Tutee):
 
 
 class Request(models.Model):
-    user = models.OneToOneField(User)
+    #user = models.OneToOneField(User)
+    user = models.CharField(max_length=30, null=True)
+    first_name = models.CharField(max_length=30, null=True)
+    last_name = models.CharField(max_length=30, null=True)
     accepted_by = models.CharField(max_length=30, null=True)
     for_class = models.CharField(max_length=30)
     description = models.CharField(max_length=300, null=True)
