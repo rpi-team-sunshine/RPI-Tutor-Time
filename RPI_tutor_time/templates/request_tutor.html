@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block head_section %}
+    <title>Request A Tutor</title>
+    <style type="text/css">
+        p.spacer {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .errortext {
+            color: #FF0000;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <fieldset>
+        <legend>Tutor Request Page</legend>
+        <form method="POST" action="/request_tutor/">{% csrf_token %}
+           <p>
+               <label>First name</label> <input name="first_name" type="text" />
+               <span class="errortext">{{ firstname_error }}</span>
+           </p>
+
+           <p>
+               <label>Last name</label> <input name="last_name" type="text" />
+               <span class="errortext">{{ lastname_error }}</span>
+           </p>
+
+           <p>
+               <label>Course</label> <input name="for_class" type="text" /> 
+           </p>
+
+           <p>
+               <label>Additional information</label> <input name="description" type="text" />
+           </p>
+
+           <p>
+               <input type="submit" value="Request Tutor" />
+           </p>
+        </form>
+    </fieldset>
+{% endblock %}
