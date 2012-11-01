@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth import logout 
-from tutor_time.models import Tutee, Tutor
+from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 
 def index(request):
@@ -59,7 +59,45 @@ def logout_view(request):
 
 
 def claim_tutee(request):
-    tutee_list = Tutee.objects.all()
-    return render_to_response('claim_tutee.html', {'tutee_list': tutee_list})
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        request_user_and_id = request.POST['choice'].split('?^?')
+        requests = Request.objects.all()
+        for req in requests:
+            if req.user == request_user_and_id[0]:
+                if req.id == int(request_user_and_id[1]):
+                    req.accepted_by = c['user'].username
+                    req.save()
+        c.update(csrf(request))
+        return render_to_response('claim_tutee.html', c)
+    else:
+        c.update(csrf(request))
+        tutee_list = Tutee.objects.all()
+        requests = Request.objects.all()
+        help_requests = []
+        for tutee in tutee_list:
+            for req in requests:
+                if tutee.user.username == req.user and req.user != c['user'].username:
+                    if not req.accepted_by:
+                        help_requests.append(req)
+ 
+        c.update(csrf(request))
+        c.update({'help_requests': help_requests})
+        return render_to_response('claim_tutee.html', c)
 
 
+def request_help(request):
+    c = RequestContext(request)
+    if request.method == 'POST':
+        fc = request.POST['for_class']
+        desc = request.POST['description']
+        d = request.POST['day']
+        t = request.POST['time']
+        helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+        helprequest.save()
+        return render_to_response('request_help.html', c)
+    else:
+        c = {}
+        c.update(csrf(request))
+        return render_to_response('request_help.html', c)
