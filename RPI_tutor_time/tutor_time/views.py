@@ -87,13 +87,13 @@ def request_help(request):
     c = RequestContext(request)
     requests = Request.objects.all()
     for req in requests:
-    if request.method == 'POST':
-        fc = request.POST['for_class']
-        desc = request.POST['description']
-        d = request.POST['day']
-        t = request.POST['time']
-        helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-        helprequest.save()
+        if request.method == 'POST':
+            fc = request.POST['for_class']
+            desc = request.POST['description']
+            d = request.POST['day']
+            t = request.POST['time']
+            helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+            helprequest.save()
         return render_to_response('request_help.html', c)
     else:
         c = {}
