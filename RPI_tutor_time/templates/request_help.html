@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block head_section %}
+    <title> Request Help </title>
+    <style type="text/css" >
+        p.space {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <fieldset>
+        <legend> Request Help </legend>
+        <form method="POST" action="/request_help/">{% csrf_token %}
+        <p><label> For Class: </label> <input name="for_class" type="text" /></p>
+        <p><label> Description: </label> <input name="description" type="text" /><p>
+        <p><label> Day: </label> <input name="day" type="text"/> <label> Time: </label> <input name="time" type="text"></p>
+        <p><input type="submit" value="Submit Request" /></p>
+        </form>
+    </fieldset>
+{% endblock %}
