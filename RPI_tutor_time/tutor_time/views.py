@@ -97,3 +97,45 @@ def request_help(request):
         c = {}
         c.update(csrf(request))
         return render_to_response('request_help.html', c)
+
+def profile(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+
+    current_user = Tutee.objects.get(user.username == c['user'].username)
+    print current_user
+
+    requests = Request.objects.all()
+    pending_requests = []
+    my_tutors = []
+    for req in requests:
+        if req.user == c['user'].username
+            
+
+
+    return render_to_response('profile.html', c)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
