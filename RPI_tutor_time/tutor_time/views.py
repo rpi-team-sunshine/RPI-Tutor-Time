@@ -89,6 +89,7 @@ def claim_tutee(request):
 
 def request_help(request):
     c = RequestContext(request)
+    c.update(csrf(request))
     if request.method == 'POST':
         fc = request.POST['for_class']
         desc = request.POST['description']
