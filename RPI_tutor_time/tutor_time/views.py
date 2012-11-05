@@ -101,18 +101,33 @@ def request_help(request):
 def profile(request):
     c = RequestContext(request)
     c.update(csrf(request))
-
-    current_user = Tutee.objects.get(user.username == c['user'].username)
-    print current_user
+    print c['user'].username
+    tutor = False
+    for tutee in Tutee.objects.all():
+        if tutee.user == c['user'].username and tutee.is_tutor():
+                tutor = True
+                print 'is tutor'
 
     requests = Request.objects.all()
     pending_requests = []
     my_tutors = []
+    if tutor:
+        my_tutees = []
     for req in requests:
-        if req.user == c['user'].username
-            
+        if req.user == c['user'].username:
+            if not req.accepted_by:
+                pending_requests.append(req)
+            else:
+                my_tutors.append(req.accepted_by)
+        elif tutor and req.accepted_by == c['user'].username:
+            my_tutees.append(req.user)
 
-
+    c.update(csrf(request))
+    c.update({'pending_requests': pending_requests})
+    c.update({'my_tutors': my_tutors})
+    c.update({'tutor': tutor})
+    if tutor:
+        c.update({'my_tutees': my_tutees})
     return render_to_response('profile.html', c)
 
 

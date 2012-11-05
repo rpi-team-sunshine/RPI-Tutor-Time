@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 
 
-from tutor_time.views
+import tutor_time.views
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
