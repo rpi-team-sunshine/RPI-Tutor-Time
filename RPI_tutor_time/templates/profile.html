@@ -26,7 +26,9 @@
     <fieldset>
         <legend>Your Tutors</legend>
             {% for tutor in my_tutors %}
-                <p><li>{{ tutor }}</li></p>
+                <p><li>{{ tutor.0.user.first_name }} {{ tutor.0.user.last_name }}</li></p>
+                <p><label>{{ tutor.0.user.email }}</label></p>
+                <p><label>For: {{ tutor.1.for_class }}</label></p> 
             {% empty %}
                 <li>You have no tutors</li>
             {% endfor %}
@@ -35,7 +37,9 @@
         <fieldset>
             <legend>Your Tutees</legend>
                 {% for tutee in my_tutees %}
-                    <p><li>{{ tutee }}</li></p>
+                    <p><li>{{ tutee.0.user.first_name }} {{tutee.0.user.last_name }}</li></p>
+                    <p><label>{{ tutee.0.user.email }}</label></p>
+                    <p><label>{{ tutee.1.for_class }}
                 {% empty %}
                     <p><li>You have no tutees</li></p>
                 {% endfor %}
