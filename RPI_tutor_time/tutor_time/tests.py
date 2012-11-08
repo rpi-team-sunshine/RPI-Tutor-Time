@@ -8,6 +8,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django.contrib.auth.models import User
 from tutor_time.models import *
+from settings import CAMPUS_EMAIL_ENDING
 
 class AccountCreationTest(TestCase):
     def setUp(self):
@@ -41,7 +42,7 @@ class AccountCreationTest(TestCase):
             'username': 'testaccount',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe@rpi.edu',
+            'email': 'johndoe@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -58,7 +59,7 @@ class AccountCreationTest(TestCase):
             'username': '1testaccount',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe@rpi.edu',
+            'email': 'johndoe@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -75,7 +76,7 @@ class AccountCreationTest(TestCase):
             'username': 'testaccount1b',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe@rpi.edu',
+            'email': 'johndoe@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -92,7 +93,7 @@ class AccountCreationTest(TestCase):
             'username': '',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe@rpi.edu',
+            'email': 'johndoe@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -126,7 +127,7 @@ class AccountCreationTest(TestCase):
             'username': 'testaccount',
             'fname': 'John',
             'lname': 'Doe',
-            'email': '1johndoe@rpi.edu',
+            'email': '1johndoe@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -143,7 +144,7 @@ class AccountCreationTest(TestCase):
             'username': 'testaccount',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe2b@rpi.edu',
+            'email': 'johndoe2b@'+CAMPUS_EMAIL_ENDING,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -154,13 +155,20 @@ class AccountCreationTest(TestCase):
 
     def test_create_account_fail_email4(self):
         """
-        Test to make a real account with a email that's not rpi
+        Test to make a real account with a email that's not the email ending 
         """
+
+        # Must not equal the CAMPUS_EMAIL_ENDING
+        if CAMPUS_EMAIL_ENDING == 'rpi.edu':
+          email = 'rit.edu'
+        else:
+          email = 'rpi.edu'
+
         data = {
             'username': 'testaccount',
             'fname': 'John',
             'lname': 'Doe',
-            'email': 'johndoe@mit.edu',
+            'email': 'johndoe@' + email,
             'password': '123456',
             'pwconfirm': '123456',
         }
@@ -260,7 +268,7 @@ class AccountLoginTest(TestCase):
         """
         Create a user account that can be used for testing authentication.
         """
-        User.objects.create_user('testington', "alpha@rpi.edu", 'alphabeta')
+        User.objects.create_user('testington', 'alpha@'+CAMPUS_EMAIL_ENDING, 'alphabeta')
 
     def tearDown(self):
         """
