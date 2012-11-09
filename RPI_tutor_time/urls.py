@@ -5,8 +5,8 @@ import tutor_time.views
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
@@ -16,11 +16,13 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     #url(r'^create_account/', include('tutor_time.urls')),
+	url(r'^request_help/', tutor_time.views.request_help, name='request_help'),
+	url(r'^claim_tutee/', tutor_time.views.claim_tutee, name='claim_tutee'),
     url(r'^create_account/', tutor_time.views.create_account),
     url(r'^login/', django.contrib.auth.views.login),
     url(r'^logout/', tutor_time.views.logout_view),
     url(r'^$', tutor_time.views.index),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
 )

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head_section %}
+        {% load static %}
+        {% get_static_prefix as STATIC_PREFIX %}
+
+        <link href="{{ STATIC_PREFIX }}css/base.css" rel="stylesheet">
+        <title>{% block title %}{% endblock %}</title>
+{% endblock %}
+
+{% block banner %}
+{% include 'banner.html' %}
+{% endblock %}
+
+{% block navigation %}
+{% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+{% endblock %}

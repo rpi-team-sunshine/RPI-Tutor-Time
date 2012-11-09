@@ -1,12 +1,94 @@
-#HEADER{width:100%;height:50px;background-color:RED;display:block;}
-#HEADERTITLE{font-size:40px;font-weight:bold;width:350px;display:inline-block;margin-left:15px;}
-body{height:100%;width:100%}
-#LOGIN{float:right;}
-#LOGIN .input_field{width:200px; display:inline-block;}
-#LOGIN .input_field.button input {width:50px;}
-#LOGIN .input_field.button {width:50px; padding-right:50px;}
-#LOGIN label{font-weight:bold;}
-#LOGIN input{border: 1px solid black; width:200px;}
-#LOGGEDIN {float:right; width:250px;}
-#LOGGEDIN span{display:block; font-weight:bold;}
-#LOGGEDIN input{border: 1px solid black; float:right; margin-right:20px;}
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.container {
+    width: 60%;
+    margin: 10px auto;
+    padding: 0;
+}
+
+.banner {
+    position: relative;
+    margin: 0;
+    background-color: #FF0000;
+    height: 100px;
+}
+
+.banner h1 {
+    font-weight: bold;
+    font-size: 48px;
+    padding: 25px 0 0 20px;
+}
+
+.banner .login {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: block;
+}
+
+.banner .login .input_field label {
+    font-weight: bold;
+    float: left;
+    margin-bottom: 5px;
+}
+
+.banner .login .input_field input {
+    float: right;
+}
+.banner .login .input_field.button input {
+    float: right;
+}
+
+.nav-bar {
+    float: left;
+    width: 25%;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.nav-bar ul {
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-bar ul li {
+    margin-top: 20px;
+}
+
+.nav-bar a:link, .nav-bar a:visited, .nav-bar a:active {
+    color: #FF0000;
+    border: 1px solid #FF0000;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.nav-bar a:hover {
+    color: #FFFFFF;
+    border: 1px solid #FF0000;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #FF0000;
+}
+
+.content {
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+p.spacer {
+    margin-top: 0;
+    margin-bottom: 0;
+}   
+.errortext {
+    color: #FF0000;
+    font-weight: bold;
+}   
+
