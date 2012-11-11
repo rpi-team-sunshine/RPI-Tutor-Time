@@ -122,8 +122,6 @@ def request_help(request):
         helprequest.save()
         return render_to_response('request_help.html', c)
     else:
-        c = {}
-        c.update(csrf(request))
         return render_to_response('request_help.html', c)
 
 def profile(request):
