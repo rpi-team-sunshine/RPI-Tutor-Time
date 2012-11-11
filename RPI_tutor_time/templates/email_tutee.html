@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+
+{% block title %}
+Email your New Tutee
+{% endblock %}
+
+{% block content %}
+    <fieldset>
+        <legend> Email </legend>
+        <form method="POST" action="/email_tutee/">
+            {% csrf_token %}
+            <input name="tutee" value="{{ target }}" style="display:none">
+            <p>
+                Send a message to your tutee. Make sure to say how to contact you.
+            </p>
+            <textarea name="message" rows="20" cols="110" onclick="this.value=''">
+            </textarea>
+            <p>
+                <input type="submit" value="Send Email" />
+            </p>
+        </form>
+    </fieldset>
+{% endblock %}
+

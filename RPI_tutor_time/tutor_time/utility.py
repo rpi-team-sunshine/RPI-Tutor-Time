@@ -1,5 +1,6 @@
 import re
 from tutor_time.models import *
+from settings import CAMPUS_EMAIL_ENDING
 
 def validate_creation(info):
     errors = {}
@@ -34,7 +35,7 @@ def validate_creation(info):
         errors['username_error'] = 'Username must be lowercase a-z followed by optional digits'
 
     # Make sure email is from rpi (eventually change to campus .edu email)
-    if re.match('^[a-z]+[0-9]*@rpi\.edu$', info['email']) is None:
+    if re.match('^[a-z]+[0-9]*@' + CAMPUS_EMAIL_ENDING.replace('.','\\.') + '$', info['email']) is None:
         errors['email_error'] = 'E-mail must be an RPI email'
 
     if len(errors) != 0:
