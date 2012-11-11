@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     #url(r'^create_account/', include('tutor_time.urls')),
+	url(r'^lookup/', tutor_time.views.lookup),
 	url(r'^accounts/profile/', tutor_time.views.profile),
     url(r'^request_help/', tutor_time.views.request_help, name='request_help'),
 	url(r'^claim_tutee/', tutor_time.views.claim_tutee, name='claim_tutee'),

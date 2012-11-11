@@ -129,27 +129,39 @@ def profile(request):
         c.update({'my_tutees': my_tutees})
     return render_to_response('profile.html', c)
 
+def lookup(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    tutor_list = get_all_tutors(c['user'].username)
+
+    roar = False
+    if tutor(c['user'].username):
+        roar = True
+        tutee_list = get_all_users(c['user'].username)
+        c.update({'tutee_list': tutee_list})
+    
+    c.update({'tutor': roar})
+    c.update({'tutor_list': tutor_list})
+    return render_to_response('lookup.html', c)
 
 
+# gets the tutee object for everyone except the current user
+def get_all_users(current):
+    everyone = Tutee.objects.exclude(user__username=current)
+    return everyone
 
+#get all the tutors except current user
+def get_all_tutors(current_user):
+    everyone = Tutee.objects.exclude(user__username=current_user)
+    tutor_list = []
+    for person in everyone:
+        if person.is_tutor():
+            tutor_list.append(person)
+    return tutor_list
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def tutor(current_user):
+    cu = Tutee.objects.get(user__username=current_user)
+    if cu.is_tutor():
+        return True
+    else:
+        return False

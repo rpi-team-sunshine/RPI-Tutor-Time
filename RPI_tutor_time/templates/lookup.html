@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+
+{% block head_section %}
+    <title>Tutor Lookup</title>
+    <style type='text/css'>
+        p.spacer {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <fieldset>
+        <legend>Available Tutors</legend>
+        <form method='POST' action='/lookup/'>{% csrf_token %}
+            {% for tutor in tutor_list %}
+                <p><li>{{ tutor.user.first_name }} {{ tutor.user.last_name }}</li></p>
+                <p><label>{{ tutor.user.email }}</label></p>
+            {% empty %}
+                <p><li>There are no available tutors</li></p>
+            {% endfor %}
+        </form>
+        {% if tutor %}
+            <fieldset>
+            <legend>All Tutees</legend>
+                {% for tutee in tutee_list %}
+                    <p><li>{{ tutee.user.first_name }} {{ tutee.user.last_name }}</li></p>
+                    <p><label>{{ tutee.user.email }}</label></p>
+                {% empty %}
+                    <p><li>There are no tutees</li></p>
+                {% endfor %}
+            </fieldset>
+        {% endif %}
+    </fieldset>
+{% endblock %}
