@@ -134,25 +134,25 @@ def lookup(request):
     c.update(csrf(request))
     tutor_list = get_all_tutors(c['user'].username)
 
-    roar = False
+    is_tutor = False
     if tutor(c['user'].username):
-        roar = True
+        is_tutor = True
         tutee_list = get_all_users(c['user'].username)
         c.update({'tutee_list': tutee_list})
     
-    c.update({'tutor': roar})
+    c.update({'tutor': is_tutor})
     c.update({'tutor_list': tutor_list})
     return render_to_response('lookup.html', c)
 
 
-# gets the tutee object for everyone except the current user
-def get_all_users(current):
-    everyone = Tutee.objects.exclude(user__username=current)
+def get_all_users(current_user):
+    '''gets the tutee object for everyone except the current user'''
+    everyone = Tutee.objects.exclude(user__username=current_user)
     return everyone
 
-#get all the tutors except current user
 def get_all_tutors(current_user):
-    everyone = Tutee.objects.exclude(user__username=current_user)
+    '''get all the tutors except current user'''
+    everyone = get_all_users(current_user)
     tutor_list = []
     for person in everyone:
         if person.is_tutor():
