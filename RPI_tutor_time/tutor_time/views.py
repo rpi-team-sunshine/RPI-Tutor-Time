@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 from tutor_time.emails import emails
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     context = RequestContext(request) 
@@ -59,6 +60,7 @@ def logout_view(request):
     return index(request)
 
 
+@login_required(login_url='/')
 def claim_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -96,6 +98,7 @@ def claim_tutee(request):
         return render_to_response('claim_tutee.html', c)
 
 
+@login_required(login_url='/')
 def email_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -110,6 +113,7 @@ def email_tutee(request):
         pass
         
 
+@login_required(login_url='/')
 def request_help(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -122,8 +126,6 @@ def request_help(request):
         helprequest.save()
         return render_to_response('request_help.html', c)
     else:
-        c = {}
-        c.update(csrf(request))
         return render_to_response('request_help.html', c)
 
 def profile(request):
