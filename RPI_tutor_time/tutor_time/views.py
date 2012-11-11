@@ -7,28 +7,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout 
 from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
+from tutor_time.emails import emails
 
 def index(request):
     context = RequestContext(request) 
     context.update(csrf(request))
     return render_to_response('index.html', context)
-
-def request_tutor(request):
-    first_name = request.POST['first_name'];	
-    last_name = request.POST['last_name'];
-    for_class = request.POST['for_class'];
-    description = request.POST['description'];
-
-    #Request = Tutee.objects.request_tutor(username,email,password)
-    r = Request    
-    r.first_name = first_name
-    r.last_name = last_name
-    r.for_class = for_class
-    r.description = description
-    r.save()
-
-    return render_to_response('index.html',
-                                  context_instance=RequestContext(request, c))
 
 def create_account(request):
     c = {
@@ -76,9 +60,89 @@ def logout_view(request):
 
 
 def claim_tutee(request):
-    tutee_list = Tutee.objects.all()
-    return render_to_response('claim_tutee.html', {'tutee_list': tutee_list})
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        msg = 'Good news, your request has been accepted by ' +\
+                c['user'].first_name + " " + c['user'].last_name +\
+                ". They should be contacting you directly shortly"
+        request_user_and_id = request.POST['choice'].split('?^?')
+        requests = Request.objects.all()
+        for req in requests:
+            if req.user == request_user_and_id[0]:
+                if req.id == int(request_user_and_id[1]):
+                    req.accepted_by = c['user'].username
+                    req.save()
+                    usr = Tutee.objects.get(user__username=req.user).user
+                    c.update({'target': req.user})
+                    emailer = emails()
+                    emailer.send_email(usr, msg, "Good News")
+                    
+        c.update(csrf(request))
+        return render_to_response('email_tutee.html', c)
+    else:
+        c.update(csrf(request))
+        tutee_list = Tutee.objects.all()
+        requests = Request.objects.all()
+        help_requests = []
+        for tutee in tutee_list:
+            for req in requests:
+                if tutee.user.username == req.user and req.user != c['user'].username:
+                    if not req.accepted_by:
+                        help_requests.append(req)
+ 
+        c.update(csrf(request))
+        c.update({'help_requests': help_requests})
+        return render_to_response('claim_tutee.html', c)
 
 
+def email_tutee(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        print request.POST
+        target = Tutee.objects.get(user__username=request.POST['tutee']).user
+        emailer = emails()
+        message = request.POST['message']
+        emailer.send_email(target, message, "A Message from your Tutor")
+        return render_to_response('index.html', c)
+    else:
+        pass
+        
 
+def request_help(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        fc = request.POST['for_class']
+        desc = request.POST['description']
+        d = request.POST['day']
+        t = request.POST['time']
+        helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+        helprequest.save()
+        msg = c['user'].first_name + " " + c['user'].last_name +\
+                " is requesting help for class " +\
+                c['user'].fc +\
+                " Please consider to help!"
+        for tutor in tutor_list:
+            if tutor.user.fc == req.fc and req.user != c['user'].username:
+                emailer = emails()
+                emailer.send_email(tutor, msg, "Requesting help!")
+        return render_to_response('request_help.html', c)
+    else:
+        c = {}
+        c.update(csrf(request))
+        return render_to_response('request_help.html', c)
 
+def email_tutor(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    if request.method == 'POST':
+        print request.POST
+        target = Tutor.objects.get(user__username=request.POST['tutor']).user
+        emailer = emails()
+        message = request.POST['message']
+        emailer.send_email(target, message, "A tutee is requesting for help!")
+        return render_to_response('index.html', c)
+    else:
+        pass
