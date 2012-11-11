@@ -5,14 +5,12 @@ from django.core.exceptions import ObjectDoesNotExist
 # Create your models here.
 class Tutee(models.Model):
     user = models.OneToOneField(User)
-
     def is_tutor(self):
         try:
             self.tutor
         except Tutor.DoesNotExist:
             return False
         return True
-
     # Place other fields here such as
     # phone_number = models.PhoneNumberField() 
     # home_address = models.TextField()
@@ -22,7 +20,6 @@ class Tutor(Tutee):
 
 
 class Request(models.Model):
-    #user = models.OneToOneField(User)
     user = models.CharField(max_length=30, null=True)
     first_name = models.CharField(max_length=30, null=True)
     last_name = models.CharField(max_length=30, null=True)
@@ -48,7 +45,3 @@ class Request(models.Model):
     days = models.CharField(max_length=2, choices=DAYS_CHOICES)
     time = models.TimeField()
 
-#class TutorTueePairs(models.Model):
-    #user1 = models.OneToOneField(User)  #tutee
-    #user2 = models.OneToOneField(User)  #tutor
-# This is probably a better way to di it, but I was getting tons of errors from syncdb
