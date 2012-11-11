@@ -34,7 +34,7 @@ def validate_creation(info):
     if re.match('^[a-z]+[0-9]*$',info['username']) is None:
         errors['username_error'] = 'Username must be lowercase a-z followed by optional digits'
 
-    # Make sure email is from rpi (eventually change to campus .edu email)
+    # Make sure email is from the campus email
     if re.match('^[a-z]+[0-9]*@' + CAMPUS_EMAIL_ENDING.replace('.','\\.') + '$', info['email']) is None:
         errors['email_error'] = 'E-mail must be an RPI email'
 
