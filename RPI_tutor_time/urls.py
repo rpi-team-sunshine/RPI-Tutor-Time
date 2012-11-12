@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^email_tutee/', tutor_time.views.email_tutee),
     url(r'^login/', django.contrib.auth.views.login),
     url(r'^logout/', tutor_time.views.logout_view),
+    url(r'^verify_account/([0-9a-z]+)', tutor_time.views.verify_account),
     url(r'^$', tutor_time.views.index),
 
     # Uncomment the next line to enable the admin:
