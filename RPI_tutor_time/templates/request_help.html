@@ -7,10 +7,26 @@ Request Help
     <fieldset>
         <legend> Request Help </legend>
         <form method="POST" action="/request_help/">{% csrf_token %}
-        <p><label> For Class: </label> <input name="for_class" type="text" /></p>
-        <p><label> Description: </label> <input name="description" type="text" /><p>
-        <p><label> Day: </label> <input name="day" type="text"/> <label> Time: </label> <input name="time" type="text"></p>
-        <p><input type="submit" value="Submit Request" /></p>
+        <p>
+            <span class="errortext">{{ request_exists_error }}</span>
+            <span class="errortext">{{ too_many_error }}</span>
+        </p>
+        <p>
+            <label> For Class: </label> <input name="for_class" type="text" />
+            <span class="errortext">{{ class_error }}</span>
+        </p>
+        <p>
+            <label> Description: </label> <input name="description" type="text" />
+            <span class="errortext">{{ description_error }}</span>
+        <p>
+        <p>
+            <label> Day: </label> <input name="day" type="text"/> <label> Time: </label> <input name="time" type="text">
+            <span class="errortext">{{ day_error }}</span>
+            <span class="errortext">{{ time_error }}</span>
+        </p>
+        <p>
+            <input type="submit" value="Submit Request" />
+        </p>
         </form>
     </fieldset>
 {% endblock %}

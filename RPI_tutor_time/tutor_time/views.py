@@ -116,18 +116,47 @@ def email_tutee(request):
 @login_required(login_url='/')
 def request_help(request):
     c = RequestContext(request)
+    c.update({
+        'class_error': '',
+        'description_error': '',
+        'day_error': '',
+        'time_error': '',
+        })
     c.update(csrf(request))
     if request.method == 'POST':
+        validate = validate_help_request(request.POST)
+        if validate is not None:
+            c.update(validate)
+            c.update(csrf(request))
+            return render_to_response('request_help.html', c)
+
+
         fc = request.POST['for_class']
         desc = request.POST['description']
         d = request.POST['day']
         t = request.POST['time']
-        helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-        helprequest.save()
+        users_requests = Request.objects.filter(user=c['user'].username)
+        print users_requests
+        valid = False
+        if len(users_requests) < 11:
+            for req in users_requests:
+                if req.for_class == fc:
+                    c.update({'request_exists_error': 'A help request for this class already exists'})
+                    valid = False
+                else:
+                    valid = True
+        elif len(users_requests) > 10:
+            c.update({'too_many_error': 'You have too many open requests'})
+
+        if valid:
+            helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+            helprequest.save()
+        print Request.objects.filter(user=c['user'].username)
         return render_to_response('request_help.html', c)
     else:
         return render_to_response('request_help.html', c)
 
+@login_required(login_url='/')
 def profile(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -159,6 +188,7 @@ def profile(request):
         c.update({'my_tutees': my_tutees})
     return render_to_response('profile.html', c)
 
+@login_required(login_url='/')
 def lookup(request):
     c = RequestContext(request)
     c.update(csrf(request))

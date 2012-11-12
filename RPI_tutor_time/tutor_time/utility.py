@@ -44,6 +44,22 @@ def validate_creation(info):
     # No errors
     return None
 
+def validate_help_request(info):
+    errors = {}
+
+    if 'for_class' not in info or info['for_class'] == '':
+        errors['class_error'] = 'For Class field is empty'
+    if 'description' not in info or info['description'] == '':
+        errors['description_error'] = 'Description field is empty'
+    if 'day' not in info or info['day'] == '':
+        errors['day_error'] = 'Day field is empty'
+    if 'time' not in info or info['time'] == '':
+        errors['time_error'] = 'Time field is empty'
+
+    if len(errors) != 0:
+        return errors
+
+
 def promote_user(user_obj):
     """
     Given a User object, creates and returns a Tutor
