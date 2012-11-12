@@ -9,6 +9,8 @@ from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 from tutor_time.emails import emails
 from django.contrib.auth.decorators import login_required
+import uuid
+import hashlib
 
 def index(request):
     context = RequestContext(request) 
@@ -43,10 +45,20 @@ def create_account(request):
         useracct.first_name = fname
         useracct.last_name = lname
         useracct.is_staff = False
+        useracct.is_active = False
         useracct.save()
 
         t = Tutee(user=useracct)
+        t.verification_id = hashlib.sha1(str(uuid.uuid4())).hexdigest()
         t.save()
+        msg = """<br />
+            Welcome to Tutor Time! Please click the link to verify your account.<br />
+            <a href="http://localhost:8000/verify_account/{0}">Verify the account</a>.<br />
+            If you cannot see the link above, please copy and paste the link below<br />
+            http://localhost:8000/verify_account/{0}<br />
+            """
+        #emails().send_email(useracct, msg.format(t.verification_id), "Please verify your account")
+        emails().simulate_send(useracct, msg.format(t.verification_id), "Please verify your account")
         c.update(csrf(request))
         return render_to_response('index.html',
                                   context_instance=RequestContext(request, c))
@@ -103,7 +115,6 @@ def email_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
     if request.method == 'POST':
-        print request.POST
         target = Tutee.objects.get(user__username=request.POST['tutee']).user
         emailer = emails()
         message = request.POST['message']
@@ -195,3 +206,21 @@ def tutor(current_user):
         return True
     else:
         return False
+
+def verify_account(request, v_id):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    account = None
+    try:
+        account = Tutee.objects.get(verification_id=v_id)
+    except Tutee.DoesNotExist:
+        return render_to_response('index.html',c)
+
+    if account is None:
+        return render_to_response('index.html',c)
+
+    account.user.is_active = True
+    account.user.save()
+    return render_to_response('index.html', c)
+    
+
