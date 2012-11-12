@@ -50,7 +50,6 @@ def create_account(request):
 
         t = Tutee(user=useracct)
         t.verification_id = hashlib.sha1(str(uuid.uuid4())).hexdigest()
-        print t.verification_id #Testing code
         t.save()
         msg = """<br />
             Welcome to Tutor Time! Please click the link to verify your account.<br />
@@ -58,10 +57,8 @@ def create_account(request):
             If you cannot see the link above, please copy and paste the link below<br />
             http://localhost:8000/verify_account/{0}<br />
             """
-        print "sending email..."
         #emails().send_email(useracct, msg.format(t.verification_id), "Please verify your account")
         emails().simulate_send(useracct, msg.format(t.verification_id), "Please verify your account")
-        print "done sending email..."
         c.update(csrf(request))
         return render_to_response('index.html',
                                   context_instance=RequestContext(request, c))
@@ -118,7 +115,6 @@ def email_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
     if request.method == 'POST':
-        print request.POST
         target = Tutee.objects.get(user__username=request.POST['tutee']).user
         emailer = emails()
         message = request.POST['message']
