@@ -20,4 +20,19 @@ class emails():
         payload['From'] = self.ouremail
         payload['To'] = user.email
         payload['Subject'] = subject 
+        print self.ouremail
+        print user.email
+        print payload.as_string()
         self.smtp.sendmail(self.ouremail, [user.email], payload.as_string())
+
+    def simulate_send(self, user, msg, subject):
+        f = open(subject.replace(' ','') + '.html','w')
+        payload = MIMEText(msg)
+        payload['From'] = self.ouremail
+        payload['To'] = user.email
+        payload['Subject'] = subject 
+        print self.ouremail
+        print user.email
+        print payload.as_string()
+        f.write(payload.as_string())
+        f.close()
