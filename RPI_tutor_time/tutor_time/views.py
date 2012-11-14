@@ -9,8 +9,7 @@ from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 from tutor_time.emails import emails
 from django.contrib.auth.decorators import login_required
-import uuid
-import hashlib
+from django.http import Http404
 
 def index(request):
     context = RequestContext(request) 
@@ -34,23 +33,7 @@ def create_account(request):
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
 
-        username = request.POST['username']
-        fname = request.POST['fname']
-        lname = request.POST['lname']
-        email = request.POST['email']
-        password = request.POST['password']
-        password_confirm = request.POST['pwconfirm']
-
-        useracct = User.objects.create_user(username,email,password)
-        useracct.first_name = fname
-        useracct.last_name = lname
-        useracct.is_staff = False
-        useracct.is_active = False
-        useracct.save()
-
-        t = Tutee(user=useracct)
-        t.verification_id = hashlib.sha1(str(uuid.uuid4())).hexdigest()
-        t.save()
+        t = create_tutee(request.POST)
         msg = """<br />
             Welcome to Tutor Time! Please click the link to verify your account.<br />
             <a href="http://localhost:8000/verify_account/{0}">Verify the account</a>.<br />
@@ -58,7 +41,7 @@ def create_account(request):
             http://localhost:8000/verify_account/{0}<br />
             """
         #emails().send_email(useracct, msg.format(t.verification_id), "Please verify your account")
-        emails().simulate_send(useracct, msg.format(t.verification_id), "Please verify your account")
+        emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
         c.update(csrf(request))
         return render_to_response('index.html',
                                   context_instance=RequestContext(request, c))
@@ -223,4 +206,28 @@ def verify_account(request, v_id):
     account.user.save()
     return render_to_response('index.html', c)
     
+@login_required(login_url='/')
+def promote_user(request):
+    c = RequestContext(request)
+    c.update(csrf(request))
+    user = c['user']
+    if not user.is_superuser:
+        raise Http404
 
+    message = ''
+    error = False
+    if request.method == 'POST':
+        try:
+            person = User.objects.get(username=request.POST['tutee'])
+            promote_to_tutor(person)
+            message = "User was successfully promoted"
+        except User.DoesNotExist:
+            message = "User not found in the database"
+            error = True
+
+    c.update({'message': message, 'error': error})
+    all_tutees = [tutee for tutee in get_all_users(user.username) if not tutee.is_tutor()]
+    all_tutees = [tutee for tutee in all_tutees if tutee.user.is_active]
+    c.update({'tutees': all_tutees})
+
+    return render_to_response('promote_user.html', c)
