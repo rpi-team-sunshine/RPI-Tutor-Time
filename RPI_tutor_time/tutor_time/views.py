@@ -9,6 +9,7 @@ from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
 from tutor_time.emails import emails
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 import uuid
 import hashlib
 
@@ -41,7 +42,13 @@ def create_account(request):
         password = request.POST['password']
         password_confirm = request.POST['pwconfirm']
 
-        useracct = User.objects.create_user(username,email,password)
+        try:
+            useracct = User.objects.create_user(username,email,password)
+        except IntegrityError:
+            c['username_error'] = 'Username already Exists'
+            return render_to_response('create_account.html',
+                                      context_instance=RequestContext(request, c))
+            
         useracct.first_name = fname
         useracct.last_name = lname
         useracct.is_staff = False
