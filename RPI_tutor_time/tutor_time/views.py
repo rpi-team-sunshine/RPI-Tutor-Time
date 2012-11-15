@@ -10,6 +10,7 @@ from tutor_time.utility import *
 from tutor_time.emails import emails
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.db import IntegrityError
 
 def index(request):
     context = RequestContext(request) 
@@ -33,7 +34,12 @@ def create_account(request):
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
 
-        t = create_tutee(request.POST)
+        try:
+            t = create_tutee(request.POST)
+        except IntegrityError:
+            c['username_error'] = 'Username already Exists'
+            return render_to_response('create_account.html',
+                                      context_instance=RequestContext(request, c))
         msg = """<br />
             Welcome to Tutor Time! Please click the link to verify your account.<br />
             <a href="http://localhost:8000/verify_account/{0}">Verify the account</a>.<br />
