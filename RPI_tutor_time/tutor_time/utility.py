@@ -1,6 +1,9 @@
 import re
 from tutor_time.models import *
 from settings import CAMPUS_EMAIL_ENDING
+import uuid
+import hashlib
+from django.contrib.auth.models import User
 
 def validate_creation(info):
     errors = {}
@@ -34,7 +37,7 @@ def validate_creation(info):
     if re.match('^[a-z]+[0-9]*$',info['username']) is None:
         errors['username_error'] = 'Username must be lowercase a-z followed by optional digits'
 
-    # Make sure email is from rpi (eventually change to campus .edu email)
+    # Make sure email is from the campus email
     if re.match('^[a-z]+[0-9]*@' + CAMPUS_EMAIL_ENDING.replace('.','\\.') + '$', info['email']) is None:
         errors['email_error'] = 'E-mail must be an RPI email'
 
@@ -60,7 +63,7 @@ def validate_help_request(info):
         return errors
 
 
-def promote_user(user_obj):
+def promote_to_tutor(user_obj):
     """
     Given a User object, creates and returns a Tutor
     """
@@ -68,3 +71,23 @@ def promote_user(user_obj):
     tutor.__dict__.update(user_obj.get_profile().__dict__)
     tutor.save()
     return tutor
+
+def create_tutee(post_data):
+    username = post_data['username']
+    fname = post_data['fname']
+    lname = post_data['lname']
+    email = post_data['email']
+    password = post_data['password']
+    password_confirm = post_data['pwconfirm']
+
+    useracct = User.objects.create_user(username,email,password)
+    useracct.first_name = fname
+    useracct.last_name = lname
+    useracct.is_staff = False
+    useracct.is_active = False
+    useracct.save()
+
+    t = Tutee(user=useracct)
+    t.verification_id = hashlib.sha1(str(uuid.uuid4())).hexdigest()
+    t.save()
+    return t

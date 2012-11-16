@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+
+{% block title %}
+Promote User
+{% endblock %}
+
+{% block content %}
+<fieldset>
+    <legend>Promote tutee to tutor</legend>
+    <form action="/promote_user/" method="POST">{% csrf_token %}
+        {% if error %}
+        <p class="errortext">{{ message }}</p>
+        {% else %}
+        <p class="successtext">{{ message }}</p>
+        {% endif %}
+        <select name="tutee">
+            {% for tutee in tutees %}
+            <option>{{ tutee.user.username }}</option>
+            {% empty %}
+            <option>There are no tutees</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Promote user" />
+    </form>
+</fieldset>
+{% endblock %}
