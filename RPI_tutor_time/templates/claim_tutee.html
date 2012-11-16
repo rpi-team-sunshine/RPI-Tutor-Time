@@ -5,6 +5,7 @@ Claim Tutee
 {% endblock %}
 
 {% block content %}
+{% if tutor %}
     <fieldset>
         <legend>Claim a Tutee!</legend>
         <form method="POST" action="/claim_tutee/">{% csrf_token %}
@@ -21,4 +22,8 @@ Claim Tutee
             <input type="submit" value="Submit" />
         </form>
     </fieldset>
+{% endif %}
+{% if not tutor %}
+    <p><label> Only tutors can claim tutees </label></p>
+{% endif %}
 {% endblock %}

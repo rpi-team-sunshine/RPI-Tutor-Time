@@ -64,6 +64,10 @@ def logout_view(request):
 def claim_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
+    is_tutor = False
+    if tutor(c['user'].username):
+        is_tutor = True
+        c.update({'tutor': tutor})
     if request.method == 'POST':
         msg = 'Good news, your request has been accepted by ' +\
                 c['user'].first_name + " " + c['user'].last_name +\
@@ -97,7 +101,6 @@ def claim_tutee(request):
         c.update({'help_requests': help_requests})
         return render_to_response('claim_tutee.html', c)
 
-
 @login_required(login_url='/')
 def email_tutee(request):
     c = RequestContext(request)
@@ -112,7 +115,6 @@ def email_tutee(request):
     else:
         pass
         
-
 @login_required(login_url='/')
 def request_help(request):
     c = RequestContext(request)
@@ -130,13 +132,11 @@ def request_help(request):
             c.update(csrf(request))
             return render_to_response('request_help.html', c)
 
-
         fc = request.POST['for_class']
         desc = request.POST['description']
         d = request.POST['day']
         t = request.POST['time']
         users_requests = Request.objects.filter(user=c['user'].username)
-        print users_requests
         valid = False
         if len(users_requests) < 11:
             for req in users_requests:
@@ -151,7 +151,16 @@ def request_help(request):
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
             helprequest.save()
-        print Request.objects.filter(user=c['user'].username)
+            if c['firstname'] != '' and c['lastname'] != '':
+                specific_request = True
+                c.update({'specific_request': specific_request})
+                target = Tutee.obgects.get(user__first_name=c['firstname'], user__last_name=c['lastname']).user
+                emailer = emails()
+                message = 'You have been requested as a tutor by ' +\
+                          c['user'].first_name + ' ' + c['user'].last_name +\
+                          '.  Log in to RPI Tutor Time to view their request.'
+                emailer.send_email(target, message, 'Tutor Request')
+
         return render_to_response('request_help.html', c)
     else:
         return render_to_response('request_help.html', c)
@@ -161,15 +170,14 @@ def profile(request):
     c = RequestContext(request)
     c.update(csrf(request))
     
-    current_user = Tutee.objects.get(user__username=c['user'].username)
-    tutor = False
-    if current_user.is_tutor():
-        tutor = True
+    is_tutor = False
+    if tutor(c['user'].username):
+        is_tutor = True
 
     requests = Request.objects.all()
     pending_requests = []
     my_tutors = []
-    if tutor:
+    if is_tutor:
         my_tutees = []
     for req in requests:
         if req.user == c['user'].username:
@@ -177,14 +185,14 @@ def profile(request):
                 pending_requests.append(req)
             else:
                 my_tutors.append((Tutee.objects.get(user__username=req.accepted_by), req))
-        elif tutor and req.accepted_by == c['user'].username:
+        elif is_tutor and req.accepted_by == c['user'].username:
             my_tutees.append((Tutee.objects.get(user__username=req.user), req))
 
     c.update(csrf(request))
     c.update({'pending_requests': pending_requests})
     c.update({'my_tutors': my_tutors})
-    c.update({'tutor': tutor})
-    if tutor:
+    c.update({'tutor': is_tutor})
+    if is_tutor:
         c.update({'my_tutees': my_tutees})
     return render_to_response('profile.html', c)
 
@@ -199,11 +207,14 @@ def lookup(request):
         is_tutor = True
         tutee_list = get_all_users(c['user'].username)
         c.update({'tutee_list': tutee_list})
-    
+
+    if request.method == 'POST':
+        tutor_name = request.POST['choice'].split('^?^')
+        return render_to_response('request_help.html', { 'firstname': tutor_name[0], 'lastname': tutor_name[1] })
+
     c.update({'tutor': is_tutor})
     c.update({'tutor_list': tutor_list})
     return render_to_response('lookup.html', c)
-
 
 def get_all_users(current_user):
     '''gets the tutee object for everyone except the current user'''

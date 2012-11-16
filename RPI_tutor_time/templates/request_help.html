@@ -7,6 +7,9 @@ Request Help
     <fieldset>
         <legend> Request Help </legend>
         <form method="POST" action="/request_help/">{% csrf_token %}
+        {% if specific_request %}
+            <label>Requesting Tutor: {{ firstname }} {{ lastname }}</label>
+        {% endif %}
         <p>
             <span class="errortext">{{ request_exists_error }}</span>
             <span class="errortext">{{ too_many_error }}</span>

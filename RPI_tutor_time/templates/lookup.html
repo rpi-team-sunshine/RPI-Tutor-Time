@@ -11,9 +11,11 @@
             {% for tutor in tutor_list %}
                 <p><li>{{ tutor.user.first_name }} {{ tutor.user.last_name }}</li></p>
                 <p><label>{{ tutor.user.email }}</label></p>
+                <p><input type="radio" name="choice" id="{{ tutor.user.first_name }}^?^{{ tutor.user.last_name }}">Request this tutor</label></p>
             {% empty %}
                 <p><li>There are no available tutors</li></p>
             {% endfor %}
+            <input type="submit" value="Submit" />
         </form>
         {% if tutor %}
             <fieldset>
