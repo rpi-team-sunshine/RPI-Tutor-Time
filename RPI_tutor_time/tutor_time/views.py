@@ -46,10 +46,11 @@ def create_account(request):
             If you cannot see the link above, please copy and paste the link below<br />
             http://localhost:8000/verify_account/{0}<br />
             """
-        #emails().send_email(useracct, msg.format(t.verification_id), "Please verify your account")
+        #emails().send_email(t.user, msg.format(t.verification_id), "Please verify your account")
         emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
         c.update(csrf(request))
-        return render_to_response('index.html',
+        c.update({'message': 'Success! Please check your email for activation', 'error': False})
+        return render_to_response('display_message.html',
                                   context_instance=RequestContext(request, c))
     else:
         c.update(csrf(request))
@@ -61,7 +62,7 @@ def logout_view(request):
     return index(request)
 
 
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def claim_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -102,7 +103,7 @@ def claim_tutee(request):
         c.update({'help_requests': help_requests})
         return render_to_response('claim_tutee.html', c)
 
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def email_tutee(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -115,7 +116,7 @@ def email_tutee(request):
     else:
         pass
         
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def request_help(request):
     c = RequestContext(request)
     c.update({
@@ -165,7 +166,7 @@ def request_help(request):
     else:
         return render_to_response('request_help.html', c)
 
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def profile(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -196,7 +197,7 @@ def profile(request):
         c.update({'my_tutees': my_tutees})
     return render_to_response('profile.html', c)
 
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def lookup(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -244,16 +245,25 @@ def verify_account(request, v_id):
     try:
         account = Tutee.objects.get(verification_id=v_id)
     except Tutee.DoesNotExist:
-        return render_to_response('index.html',c)
+        message = 'Account does not exist'
+        error = True
+        c.update({'message': message, 'error': error})
+        return render_to_response('display_message.html',c)
 
     if account is None:
-        return render_to_response('index.html',c)
+        message = 'Account does not exist'
+        error = True
+        c.update({'message': message, 'error': error})
+        return render_to_response('display_message.html',c)
 
     account.user.is_active = True
     account.user.save()
-    return render_to_response('index.html', c)
+    message = 'Account successfully activated, you may now log in'
+    error = False
+    c.update({'message': message, 'error': error})
+    return render_to_response('display_message.html',c)
     
-@login_required(login_url='/')
+@login_required(login_url='/loginerror')
 def promote_user(request):
     c = RequestContext(request)
     c.update(csrf(request))
@@ -278,3 +288,9 @@ def promote_user(request):
     c.update({'tutees': all_tutees})
 
     return render_to_response('promote_user.html', c)
+
+def loginerror(request):
+  c = RequestContext(request)
+  c.update(csrf(request))
+  c.update({'message': 'Please log in to view the page', 'error': True})
+  return render_to_response('display_message.html', c)

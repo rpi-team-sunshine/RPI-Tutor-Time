@@ -1,0 +1,17 @@
+{% extends "main.html" %}
+
+{% block title %}
+{% if error %}
+  An error has occurred!
+{% else %}
+  Success!
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if error %}
+  <p class="errortext">An error has occurred: {{message}}</p>
+{% else %}
+  <p class="successtext">{{message}}</p>
+{% endif %}
+{% endblock %}
