@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
@@ -199,6 +199,9 @@ def request_help(request):
 def profile(request):
     c = RequestContext(request)
     c.update(csrf(request))
+
+    if c['user'].is_superuser:
+      return redirect('/promote_user/', permanant=True)
     
     is_tutor = False
     if tutor(c['user'].username):
@@ -331,7 +334,9 @@ def promote_user(request):
 
     # Grab all tutees who are active and not a tutor already
     all_tutees = [tutee for tutee in get_all_users(user.username) if not tutee.is_tutor()]
+    print all_tutees
     all_tutees = [tutee for tutee in all_tutees if tutee.user.is_active]
+    print all_tutees
     c.update({'tutees': all_tutees})
 
     return render_to_response('promote_user.html', c)
