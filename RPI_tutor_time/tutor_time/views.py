@@ -5,10 +5,20 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout 
 from tutor_time.models import Tutee, Tutor, Request
 from tutor_time.utility import *
-from tutor_time.emails import emails
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.db import IntegrityError
+
+# If we're testing by simulating emails (ie no SMTP server avaliable)
+try:
+  from settings import SIMULATE_EMAIL
+except ImportError:
+  SIMULATE_EMAIL = False
+
+if SIMULATE_EMAIL:
+  from tutor_time.emails import dummy_emails as emails
+else:
+  from tutor_time.emails import emails
 
 def index(request):
     context = RequestContext(request) 
@@ -59,8 +69,8 @@ def create_account(request):
             If you cannot see the link above, please copy and paste the link below<br />
             http://localhost:8000/verify_account/{0}<br />
             """
-        #emails().send_email(t.user, msg.format(t.verification_id), "Please verify your account")
-        emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
+        emails().send_email(t.user, msg.format(t.verification_id), "Please verify your account")
+        #emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
 
         # Load success page
         c.update(csrf(request))
