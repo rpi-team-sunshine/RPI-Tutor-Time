@@ -151,19 +151,22 @@ def request_help(request):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-            helprequest.save()
             if c['firstname'] != '' and c['lastname'] != '':
                 specific_request = True
+                helprequest.requested = c['username']
                 c.update({'specific_request': specific_request})
-                target = Tutee.obgects.get(user__first_name=c['firstname'], user__last_name=c['lastname']).user
+                target = Tutee.objects.get(user__username=c['username']).user
                 emailer = emails()
                 message = 'You have been requested as a tutor by ' +\
                           c['user'].first_name + ' ' + c['user'].last_name +\
                           '.  Log in to RPI Tutor Time to view their request.'
                 emailer.send_email(target, message, 'Tutor Request')
+            helprequest.save()
 
         return render_to_response('request_help.html', c)
     else:
+        if c['firstname'] != '' and c['lastname'] != '':
+            specific_request = True
         return render_to_response('request_help.html', c)
 
 @login_required(login_url='/loginerror')
@@ -211,7 +214,7 @@ def lookup(request):
 
     if request.method == 'POST':
         tutor_name = request.POST['choice'].split('^?^')
-        return render_to_response('request_help.html', { 'firstname': tutor_name[0], 'lastname': tutor_name[1] })
+        return render_to_response('request_help.html', { 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2] })
 
     c.update({'tutor': is_tutor})
     c.update({'tutor_list': tutor_list})
