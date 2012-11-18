@@ -177,7 +177,7 @@ def request_help(request):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-            if c['firstname'] != '' and c['lastname'] != '':
+            if c['user'].first_name != '' and c['user'].last_name != '':
                 specific_request = True
                 helprequest.requested = c['username']
                 c.update({'specific_request': specific_request})
@@ -191,7 +191,7 @@ def request_help(request):
 
         return render_to_response('request_help.html', c)
     else:
-        if c['firstname'] != '' and c['lastname'] != '':
+        if c['user'].first_name != '' and c['user'].last_name != '':
             specific_request = True
         return render_to_response('request_help.html', c)
 
