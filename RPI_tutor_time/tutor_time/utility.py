@@ -6,6 +6,11 @@ import hashlib
 from django.contrib.auth.models import User
 
 def validate_creation(info):
+    """
+    validate_creation takes a dictionary info and returns a dictionary of error messages
+    or None if there were no issues with the data being passed in.
+    """
+
     errors = {}
 
     # Check to make sure things are existing
@@ -73,6 +78,12 @@ def promote_to_tutor(user_obj):
     return tutor
 
 def create_tutee(post_data):
+    """
+    create_tutee takes a dictionary representing post_data to the create_account view
+    and creates a User account and a Tutee account for that person. Returns a Tutee object
+    on success. Failure can occur on a IntegrityError (Please try/except when calling this function)
+    """
+
     username = post_data['username']
     fname = post_data['fname']
     lname = post_data['lname']

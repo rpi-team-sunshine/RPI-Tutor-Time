@@ -1,5 +1,3 @@
-# Create your views here.
-
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.context_processors import csrf
@@ -18,6 +16,15 @@ def index(request):
     return render_to_response('index.html', context)
 
 def create_account(request):
+    """
+    View responsible for creating an account. If the request coming in is a GET request,
+    It will load the template. If the request is a POST it will validate the data, and if
+    there is an error, it will return the template with error messages, otherwise it will
+    build the account then send a verification email, then it will return a template with
+    a success message.
+    """
+
+    # Error messages
     c = {
         'password_error': '',
         'username_error': '',
@@ -27,19 +34,25 @@ def create_account(request):
     }
 
     if request.method == 'POST':
+        # Check if data is ok
         valid = validate_creation(request.POST)
+
+        # If there was a dictionary returned, load the template with the error messages
         if valid is not None:
             c.update(valid)
             c.update(csrf(request))
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
 
+        # Otherwise attempt to create an account and if we get an error, render the error message
         try:
             t = create_tutee(request.POST)
         except IntegrityError:
             c['username_error'] = 'Username already Exists'
             return render_to_response('create_account.html',
                                       context_instance=RequestContext(request, c))
+
+        # Account creation a success! Make an email message and send it out!
         msg = """<br />
             Welcome to Tutor Time! Please click the link to verify your account.<br />
             <a href="http://localhost:8000/verify_account/{0}">Verify the account</a>.<br />
@@ -48,14 +61,17 @@ def create_account(request):
             """
         #emails().send_email(t.user, msg.format(t.verification_id), "Please verify your account")
         emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
+
+        # Load success page
         c.update(csrf(request))
         c.update({'message': 'Success! Please check your email for activation', 'error': False})
         return render_to_response('display_message.html',
                                   context_instance=RequestContext(request, c))
-    else:
-        c.update(csrf(request))
-        return render_to_response('create_account.html',
-                                  context_instance=RequestContext(request, c))
+
+    # GET request, Return the page to create an account
+    c.update(csrf(request))
+    return render_to_response('create_account.html',
+                              context_instance=RequestContext(request, c))
 
 def logout_view(request):
     logout(request)
@@ -239,9 +255,16 @@ def tutor(current_user):
         return False
 
 def verify_account(request, v_id):
+    """
+    verify_account takes a request and an v_id which is grabbed from the url.
+    The view will try to compare the id with the one stored for that user, and if
+    they equal, it will set the user to be active. Otherwise it will result in an error.
+    """
     c = RequestContext(request)
     c.update(csrf(request))
     account = None
+    
+    # Find the user who has the id and if they do not exist, render an error message
     try:
         account = Tutee.objects.get(verification_id=v_id)
     except Tutee.DoesNotExist:
@@ -250,12 +273,14 @@ def verify_account(request, v_id):
         c.update({'message': message, 'error': error})
         return render_to_response('display_message.html',c)
 
+    # If somehow the DB returns None, also render an error page
     if account is None:
         message = 'Account does not exist'
         error = True
         c.update({'message': message, 'error': error})
         return render_to_response('display_message.html',c)
 
+    # Otherwise set user to be active and render a success message
     account.user.is_active = True
     account.user.save()
     message = 'Account successfully activated, you may now log in'
@@ -265,6 +290,10 @@ def verify_account(request, v_id):
     
 @login_required(login_url='/loginerror')
 def promote_user(request):
+    """
+    promote_user is a view for just the superuser(s). It renders a page with a dropdown list
+    of tutees and the superuser can promote them to a tutor.
+    """
     c = RequestContext(request)
     c.update(csrf(request))
     user = c['user']
@@ -273,6 +302,8 @@ def promote_user(request):
 
     message = ''
     error = False
+
+    # On POST request promote the tutee being passed in.
     if request.method == 'POST':
         try:
             person = User.objects.get(username=request.POST['tutee'])
@@ -282,7 +313,10 @@ def promote_user(request):
             message = "User not found in the database"
             error = True
 
+    # Load the page with optional messages
     c.update({'message': message, 'error': error})
+
+    # Grab all tutees who are active and not a tutor already
     all_tutees = [tutee for tutee in get_all_users(user.username) if not tutee.is_tutor()]
     all_tutees = [tutee for tutee in all_tutees if tutee.user.is_active]
     c.update({'tutees': all_tutees})
@@ -290,7 +324,12 @@ def promote_user(request):
     return render_to_response('promote_user.html', c)
 
 def loginerror(request):
-  c = RequestContext(request)
-  c.update(csrf(request))
-  c.update({'message': 'Please log in to view the page', 'error': True})
-  return render_to_response('display_message.html', c)
+    """
+    Loads a message requesting a user log in. This is displayed when
+    a user attempts to go somewhere without being logged in when they
+    should be.
+    """
+    c = RequestContext(request)
+    c.update(csrf(request))
+    c.update({'message': 'Please log in to view the page', 'error': True})
+    return render_to_response('display_message.html', c)
