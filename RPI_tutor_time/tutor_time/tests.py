@@ -247,7 +247,7 @@ class AccountCreationTest(TestCase):
 
     def test_create_account_fail_lastname1(self):
         """
-        Test to make a real account with no first name
+        Test to make a real account with no last name
         """
         data = {
             'username': 'testaccount',
