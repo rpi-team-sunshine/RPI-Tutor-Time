@@ -15,7 +15,6 @@ class emails():
         """Send the email address in the user object an email
            The content of this email is msg.
            Subject must not be null. This way we pass more spam filters"""
-        print "Real Email"
         payload = MIMEText(msg)
         payload['From'] = self.ouremail
         payload['To'] = user.email
