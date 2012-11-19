@@ -11,16 +11,17 @@ from django.db import IntegrityError
 
 # If we're testing by simulating emails (ie no SMTP server avaliable)
 try:
-  from settings import SIMULATE_EMAIL
+    from settings import SIMULATE_EMAIL
 except ImportError:
-  SIMULATE_EMAIL = False
+    SIMULATE_EMAIL = False
 
 if SIMULATE_EMAIL:
-  from tutor_time.emails import dummy_emails as emails
+    from tutor_time.emails import dummy_emails as emails
 else:
-  from tutor_time.emails import emails
+    from tutor_time.emails import emails
 
 def index(request):
+    """Render the default index page"""
     context = RequestContext(request) 
     context.update(csrf(request))
     return render_to_response('index.html', context)
@@ -109,6 +110,7 @@ def claim_tutee(request):
                     req.save()
                     usr = Tutee.objects.get(user__username=req.user).user
                     c.update({'target': req.user})
+                    #Email the student
                     emailer = emails()
                     emailer.send_email(usr, msg, "Good News")
                     
@@ -131,14 +133,15 @@ def claim_tutee(request):
 
 @login_required(login_url='/loginerror')
 def email_tutee(request):
-    c = RequestContext(request)
-    c.update(csrf(request))
+    """Page to allow a tutor to email their new tutee"""
+    context = RequestContext(request)
+    context.update(csrf(request))
     if request.method == 'POST':
         target = Tutee.objects.get(user__username=request.POST['tutee']).user
-        emailer = emails()
         message = request.POST['message']
+        emailer = emails()
         emailer.send_email(target, message, "A Message from your Tutor")
-        return render_to_response('index.html', c)
+        return render_to_response('index.html', context)
     else:
         pass
         
@@ -253,12 +256,12 @@ def lookup(request):
     return render_to_response('lookup.html', c)
 
 def get_all_users(current_user):
-    '''gets the tutee object for everyone except the current user'''
+    """gets the tutee object for everyone except the current user"""
     everyone = Tutee.objects.exclude(user__username=current_user)
     return everyone
 
 def get_all_tutors(current_user):
-    '''get all the tutors except current user'''
+    """get all the tutors except current user"""
     everyone = get_all_users(current_user)
     tutor_list = []
     for person in everyone:
