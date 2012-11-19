@@ -15,9 +15,26 @@ class emails():
         """Send the email address in the user object an email
            The content of this email is msg.
            Subject must not be null. This way we pass more spam filters"""
-
         payload = MIMEText(msg)
         payload['From'] = self.ouremail
         payload['To'] = user.email
         payload['Subject'] = subject 
         self.smtp.sendmail(self.ouremail, [user.email], payload.as_string())
+
+class dummy_emails():
+    """Handling of sending fake emails"""
+
+    def __init__(self):
+        self.ouremail = "noreply@rpitutortime.com"
+
+    def send_email(self, user, msg, subject):
+        """
+        Create a dummy email in the manage.py directory
+        """
+        f = open(subject.replace(' ','') + '.html','w')
+        payload = MIMEText(msg)
+        payload['From'] = self.ouremail
+        payload['To'] = user.email
+        payload['Subject'] = subject 
+        f.write(payload.as_string())
+        f.close()

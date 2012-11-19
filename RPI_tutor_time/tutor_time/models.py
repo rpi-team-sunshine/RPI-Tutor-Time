@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 # Create your models here.
 class Tutee(models.Model):
     user = models.OneToOneField(User)
+    verification_id = models.CharField(max_length=50, null=False)
     def is_tutor(self):
         try:
             self.tutor
@@ -20,10 +21,11 @@ class Tutor(Tutee):
 
 
 class Request(models.Model):
-    user = models.CharField(max_length=30, null=True)
-    first_name = models.CharField(max_length=30, null=True)
-    last_name = models.CharField(max_length=30, null=True)
+    user = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     accepted_by = models.CharField(max_length=30, null=True)
+    requested = models.CharField(max_length=30, null=True)
     for_class = models.CharField(max_length=30)
     description = models.CharField(max_length=300, null=True)
     MON = 'M'

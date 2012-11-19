@@ -7,6 +7,11 @@ Request Help
     <fieldset>
         <legend> Request Help </legend>
         <form method="POST" action="/request_help/">{% csrf_token %}
+        {% if specific_request %}
+            <label>Requesting Tutor: {{ firstname }} {{ lastname }}</label>
+            <input type="text" name="requested" value="{{ username }}" style="display: none;" />
+            <input type="text" name="specific_request" value="True" style="display: none;" />
+        {% endif %}
         <p>
             <span class="errortext">{{ request_exists_error }}</span>
             <span class="errortext">{{ too_many_error }}</span>
@@ -16,16 +21,22 @@ Request Help
             <span class="errortext">{{ class_error }}</span>
         </p>
         <p>
-            <label> Description: </label> <input name="description" type="text" />
+            <label> Description: </label> <textarea rows="5" cols="50" name="description" type="text"></textarea>
+        </p>
+        <p>
             <span class="errortext">{{ description_error }}</span>
         <p>
         <p>
             <label> Day: </label> <input name="day" type="text"/> <label> Time: </label> <input name="time" type="text">
+        </p>
+        <p>
             <span class="errortext">{{ day_error }}</span>
+        </p>
+        <p>
             <span class="errortext">{{ time_error }}</span>
         </p>
         <p>
-            <input type="submit" value="Submit Request" />
+            <input type="submit" id="submit" value="Submit Request" />
         </p>
         </form>
     </fieldset>

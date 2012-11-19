@@ -247,7 +247,7 @@ class AccountCreationTest(TestCase):
 
     def test_create_account_fail_lastname1(self):
         """
-        Test to make a real account with no first name
+        Test to make a real account with no last name
         """
         data = {
             'username': 'testaccount',
@@ -271,10 +271,6 @@ class AccountLoginTest(TestCase):
         User.objects.create_user('testington', 'alpha@'+CAMPUS_EMAIL_ENDING, 'alphabeta')
 
     def tearDown(self):
-        """
-        Should delete account but Django does not make it easy.
-        Not worth the effort to figure out.
-        """
         pass
 
     def not_logged_in(self):

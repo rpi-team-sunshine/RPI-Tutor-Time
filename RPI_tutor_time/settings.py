@@ -151,3 +151,4 @@ LOGGING = {
 AUTH_PROFILE_MODULE = 'tutor_time.Tutee'
 
 CAMPUS_EMAIL_ENDING = 'rpi.edu'
+SIMULATE_EMAIL = True

@@ -1,0 +1,33 @@
+<html>
+  <head>
+    {% load static %}
+    {% get_static_prefix as STATIC_PREFIX %}
+
+    <link href="{{ STATIC_PREFIX }}css/base.css" rel="stylesheet">
+
+    <title>Promote User</title>
+  </head>
+
+  <body>
+    <fieldset>
+        <legend>Promote tutee to tutor</legend>
+        <form action="/promote_user/" method="POST">{% csrf_token %}
+            {% if error %}
+            <p class="errortext">{{ message }}</p>
+            {% else %}
+            <p class="successtext">{{ message }}</p>
+            {% endif %}
+            <select name="tutee">
+                {% for tutee in tutees %}
+                <option>{{ tutee.user.username }}</option>
+                {% empty %}
+                <option>There are no tutees</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Promote user" />
+        </form>
+    </fieldset>
+
+    <a href="/logout/">Logout</a>
+  </body>
+</html>
