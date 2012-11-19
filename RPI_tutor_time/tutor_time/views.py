@@ -95,7 +95,7 @@ def claim_tutee(request):
     is_tutor = False
     if tutor(c['user'].username):
         is_tutor = True
-        c.update({'tutor': tutor})
+        c.update({'tutor': is_tutor})
     if request.method == 'POST':
         msg = 'Good news, your request has been accepted by ' +\
                 c['user'].first_name + " " + c['user'].last_name +\
@@ -145,13 +145,13 @@ def email_tutee(request):
 @login_required(login_url='/loginerror')
 def request_help(request):
     c = RequestContext(request)
+    c.update(csrf(request))
     c.update({
         'class_error': '',
         'description_error': '',
         'day_error': '',
         'time_error': '',
         })
-    c.update(csrf(request))
     if request.method == 'POST':
         validate = validate_help_request(request.POST)
         if validate is not None:
@@ -164,7 +164,7 @@ def request_help(request):
         d = request.POST['day']
         t = request.POST['time']
         users_requests = Request.objects.filter(user=c['user'].username)
-        valid = False
+        valid = True
         if len(users_requests) < 11:
             for req in users_requests:
                 if req.for_class == fc:
@@ -174,25 +174,25 @@ def request_help(request):
                     valid = True
         elif len(users_requests) > 10:
             c.update({'too_many_error': 'You have too many open requests'})
+            valid = False
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-            if c['user'].first_name != '' and c['user'].last_name != '':
-                specific_request = True
-                helprequest.requested = c['username']
-                c.update({'specific_request': specific_request})
-                target = Tutee.objects.get(user__username=c['username']).user
+            if request.POST['specific_request']:
+                print 'roar'
+                helprequest.requested = request.POST['requested']
+                helprequest.save()
+                target = Tutee.objects.get(user__username=request.POST['requested']).user
                 emailer = emails()
                 message = 'You have been requested as a tutor by ' +\
                           c['user'].first_name + ' ' + c['user'].last_name +\
                           '.  Log in to RPI Tutor Time to view their request.'
                 emailer.send_email(target, message, 'Tutor Request')
-            helprequest.save()
+            else:
+                helprequest.save()
 
         return render_to_response('request_help.html', c)
     else:
-        if c['user'].first_name != '' and c['user'].last_name != '':
-            specific_request = True
         return render_to_response('request_help.html', c)
 
 @login_required(login_url='/loginerror')
@@ -243,7 +243,10 @@ def lookup(request):
 
     if request.method == 'POST':
         tutor_name = request.POST['choice'].split('^?^')
-        return render_to_response('request_help.html', { 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2] })
+        print tutor_name
+        c.update({ 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2], 'specific_request': True })
+        print c['specific_request']
+        return render_to_response('request_help.html',c)
 
     c.update({'tutor': is_tutor})
     c.update({'tutor_list': tutor_list})
