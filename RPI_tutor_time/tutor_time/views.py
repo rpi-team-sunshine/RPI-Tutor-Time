@@ -181,7 +181,7 @@ def request_help(request):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-            if request.POST['specific_request']:
+            if 'specific_request' in request.POST:
                 print 'roar'
                 helprequest.requested = request.POST['requested']
                 helprequest.save()
