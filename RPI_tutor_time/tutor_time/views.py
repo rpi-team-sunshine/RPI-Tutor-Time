@@ -8,6 +8,7 @@ from tutor_time.utility import *
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.db import IntegrityError
+from django.views.generic import TemplateView
 
 # If we're testing by simulating emails (ie no SMTP server avaliable)
 try:
@@ -20,13 +21,35 @@ if SIMULATE_EMAIL:
 else:
     from tutor_time.emails import emails
 
-def index(request):
-    """Render the default index page"""
-    context = RequestContext(request) 
-    context.update(csrf(request))
-    return render_to_response('index.html', context)
+class baseView(TemplateView):
+    def post(self, request, *args, **kwargs):
+        pass
 
-def create_account(request):
+    def get(self, request, *args, **kwargs):
+        pass
+
+class emailTuteeView(baseView):
+
+    def post(self, request, *args, **kwargs):
+        """Page to allow a tutor to email their new tutee"""
+        context = RequestContext(request)
+        context.update(csrf(request))
+        target = Tutee.objects.get(user__username=request.POST['tutee']).user
+        message = request.POST['message']
+        emailer = emails()
+        emailer.send_email(target, message, "A Message from your Tutor")
+        return render_to_response('index.html', context)
+
+       
+class index(baseView): 
+
+    def get(self, request, *args, **kwargs):
+        """Render the default index page"""
+        context = RequestContext(request) 
+        context.update(csrf(request))
+        return render_to_response('index.html', context)
+
+class create_account(baseView):
     """
     View responsible for creating an account. If the request coming in is a GET request,
     It will load the template. If the request is a POST it will validate the data, and if
@@ -35,16 +58,15 @@ def create_account(request):
     a success message.
     """
 
-    # Error messages
-    c = {
-        'password_error': '',
-        'username_error': '',
-        'email_error': '',
-        'firstname_error': '',
-        'lastname_error': ''
-    }
-
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs): 
+        # Error messages
+        c = {
+            'password_error': '',
+            'username_error': '',
+            'email_error': '',
+            'firstname_error': '',
+            'lastname_error': ''
+        }
         # Check if data is ok
         valid = validate_creation(request.POST)
 
@@ -71,7 +93,6 @@ def create_account(request):
             http://localhost:8000/verify_account/{0}<br />
             """
         emails().send_email(t.user, msg.format(t.verification_id), "Please verify your account")
-        #emails().simulate_send(t.user, msg.format(t.verification_id), "Please verify your account")
 
         # Load success page
         c.update(csrf(request))
@@ -80,24 +101,45 @@ def create_account(request):
                                   context_instance=RequestContext(request, c))
 
     # GET request, Return the page to create an account
-    c.update(csrf(request))
-    return render_to_response('create_account.html',
-                              context_instance=RequestContext(request, c))
+    def get(self, request, *args, **kwargs):
+        c = {
+            'password_error': '',
+            'username_error': '',
+            'email_error': '',
+            'firstname_error': '',
+            'lastname_error': ''
+        }
 
-def logout_view(request):
-    logout(request)
-    return index(request)
+        c.update(csrf(request))
+        return render_to_response('create_account.html',
+                                  context_instance=RequestContext(request, c))
+
+class logout_view(baseView):
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        c = {}
+        c.update(csrf(request))
+        return render_to_response('index.html',c)
 
 
-@login_required(login_url='/loginerror')
-def claim_tutee(request):
-    c = RequestContext(request)
-    c.update(csrf(request))
-    is_tutor = False
-    if tutor(c['user'].username):
-        is_tutor = True
-        c.update({'tutor': is_tutor})
-    if request.method == 'POST':
+class claim_tutee(baseView):
+
+    def getContext(self, request):
+        """Adds user object and csrf to the context"""
+        c = RequestContext(request)
+        c.update(csrf(request))
+        return c
+
+    def post(self, request, *args, **kwargs):
+        """
+        Claims a tutee, only accessible for tutors. 
+        """
+        c = self.getContext(request)
+        is_tutor = False
+        if tutor(c['user'].username):
+            is_tutor = True
+            c.update({'tutor': is_tutor})
         msg = 'Good news, your request has been accepted by ' +\
                 c['user'].first_name + " " + c['user'].last_name +\
                 ". They should be contacting you directly shortly"
@@ -116,8 +158,18 @@ def claim_tutee(request):
                     
         c.update(csrf(request))
         return render_to_response('email_tutee.html', c)
-    else:
-        c.update(csrf(request))
+
+    def get(self, request, *args, **kwargs):
+        """
+        Get the list of help requests.
+        Only tutors can claim tutees.
+        Tutors cannot claim themselves
+        """
+        c = self.getContext(request) 
+        is_tutor = False
+        if tutor(c['user'].username):
+            is_tutor = True
+            c.update({'tutor': is_tutor})
         tutee_list = Tutee.objects.all()
         requests = Request.objects.all()
         help_requests = []
@@ -131,31 +183,25 @@ def claim_tutee(request):
         c.update({'help_requests': help_requests})
         return render_to_response('claim_tutee.html', c)
 
-@login_required(login_url='/loginerror')
-def email_tutee(request):
-    """Page to allow a tutor to email their new tutee"""
-    context = RequestContext(request)
-    context.update(csrf(request))
-    if request.method == 'POST':
-        target = Tutee.objects.get(user__username=request.POST['tutee']).user
-        message = request.POST['message']
-        emailer = emails()
-        emailer.send_email(target, message, "A Message from your Tutor")
-        return render_to_response('index.html', context)
-    else:
-        pass
-        
-@login_required(login_url='/loginerror')
-def request_help(request):
-    c = RequestContext(request)
-    c.update(csrf(request))
-    c.update({
-        'class_error': '',
-        'description_error': '',
-        'day_error': '',
-        'time_error': '',
-        })
-    if request.method == 'POST':
+class request_help(baseView):
+
+    def getContext(self, request):
+        """Add information to the context"""
+        c = RequestContext(request)
+        c.update(csrf(request))
+        c.update({
+            'class_error': '',
+            'description_error': '',
+            'day_error': '',
+            'time_error': '',
+            })
+        return c
+
+    def post(self, request, *args, **kwargs):
+        """
+        Allow a tutee to submit a help request.
+        """
+        c = self.getContext(request)
         validate = validate_help_request(request.POST)
         if validate is not None:
             c.update(validate)
@@ -168,6 +214,10 @@ def request_help(request):
         t = request.POST['time']
         users_requests = Request.objects.filter(user=c['user'].username)
         valid = True
+        """
+        If the user has ten requests, then they are not able to create a new one.
+        If the user has already requested help for a specific class then they are not able to request help for that class again
+        """
         if len(users_requests) < 11:
             for req in users_requests:
                 if req.for_class == fc:
@@ -181,8 +231,10 @@ def request_help(request):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+            """
+            if a tutor is being specifically requested then they will recieve an email informing them of the request
+            """
             if 'specific_request' in request.POST:
-                print 'roar'
                 helprequest.requested = request.POST['requested']
                 helprequest.save()
                 target = Tutee.objects.get(user__username=request.POST['requested']).user
@@ -195,73 +247,96 @@ def request_help(request):
                 helprequest.save()
 
         return render_to_response('request_help.html', c)
-    else:
+    def get(self, request, *args, **kwargs):
+        """
+        Display a page where a user can fill out information to get help.
+        """
+        c = self.getContext(request)
         return render_to_response('request_help.html', c)
 
-@login_required(login_url='/loginerror')
-def profile(request):
-    c = RequestContext(request)
-    c.update(csrf(request))
+class profile(baseView):
 
-    if c['user'].is_superuser:
-      return redirect('/promote_user/', permanant=True)
-    
-    is_tutor = False
-    if tutor(c['user'].username):
-        is_tutor = True
+    def get(self, request, *args, **kwargs):
+        """
+        Generates a profile page for the user.
+        For tutees, it displays pending requests, your tutors and what they're tutoring for.
+        If you are tutor, in addition you see your tutees and what you're tutoring them for.
+        """
+        c = RequestContext(request)
+        c.update(csrf(request))
+        if c['user'].is_superuser:
+          return redirect('/promote_user/', permanant=True)
+        
+        is_tutor = False
+        if tutor(c['user'].username):
+            is_tutor = True
 
-    requests = Request.objects.all()
-    pending_requests = []
-    my_tutors = []
-    if is_tutor:
-        my_tutees = []
-    for req in requests:
-        if req.user == c['user'].username:
-            if not req.accepted_by:
-                pending_requests.append(req)
-            else:
-                my_tutors.append((Tutee.objects.get(user__username=req.accepted_by), req))
-        elif is_tutor and req.accepted_by == c['user'].username:
-            my_tutees.append((Tutee.objects.get(user__username=req.user), req))
+        requests = Request.objects.all()
+        pending_requests = []
+        my_tutors = []
+        if is_tutor:
+            my_tutees = []
+        for req in requests:
+            if req.user == c['user'].username:
+                if not req.accepted_by:
+                    pending_requests.append(req)
+                else:
+                    my_tutors.append((Tutee.objects.get(user__username=req.accepted_by), req))
+            elif is_tutor and req.accepted_by == c['user'].username:
+                my_tutees.append((Tutee.objects.get(user__username=req.user), req))
 
-    c.update(csrf(request))
-    c.update({'pending_requests': pending_requests})
-    c.update({'my_tutors': my_tutors})
-    c.update({'tutor': is_tutor})
-    if is_tutor:
-        c.update({'my_tutees': my_tutees})
-    return render_to_response('profile.html', c)
+        c.update(csrf(request))
+        c.update({'pending_requests': pending_requests})
+        c.update({'my_tutors': my_tutors})
+        c.update({'tutor': is_tutor})
+        if is_tutor:
+            c.update({'my_tutees': my_tutees})
+        return render_to_response('profile.html', c)
 
-@login_required(login_url='/loginerror')
-def lookup(request):
-    c = RequestContext(request)
-    c.update(csrf(request))
-    tutor_list = get_all_tutors(c['user'].username)
+class lookup(baseView):
 
-    is_tutor = False
-    if tutor(c['user'].username):
-        is_tutor = True
-        tutee_list = get_all_users(c['user'].username)
-        c.update({'tutee_list': tutee_list})
+    def getContext(self, request):
+        """Add additional information to the context"""
+        c = RequestContext(request)
+        c.update(csrf(request))
+        tutor_list = get_all_tutors(c['user'].username)
 
-    if request.method == 'POST':
+        is_tutor = False
+        if tutor(c['user'].username):
+            is_tutor = True
+            tutee_list = get_all_users(c['user'].username)
+            c.update({'tutee_list': tutee_list})
+        c.update({'tutor': is_tutor})
+        c.update({'tutor_list': tutor_list})
+        return c
+
+    def post(self, request, *args, **kwargs):
+        """ Select a specific tutor to ask for help """
+        c = self.getContext(request)
         tutor_name = request.POST['choice'].split('^?^')
-        print tutor_name
         c.update({ 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2], 'specific_request': True })
-        print c['specific_request']
         return render_to_response('request_help.html',c)
 
-    c.update({'tutor': is_tutor})
-    c.update({'tutor_list': tutor_list})
-    return render_to_response('lookup.html', c)
+    def get(self, request, *args, **kwargs):
+        """
+        If you are a tutee it displays a list of tutors.
+        If you are a tutor, you also see all the tutees.
+        """
+        c = self.getContext(request)
+        return render_to_response('lookup.html', c)
 
 def get_all_users(current_user):
-    """gets the tutee object for everyone except the current user"""
+    """
+    gets the tutee object for everyone except the current user
+    """
+
     everyone = Tutee.objects.exclude(user__username=current_user)
     return everyone
 
 def get_all_tutors(current_user):
-    """get all the tutors except current user"""
+    """
+    get all the tutors except current user
+    """
     everyone = get_all_users(current_user)
     tutor_list = []
     for person in everyone:
@@ -270,6 +345,9 @@ def get_all_tutors(current_user):
     return tutor_list
 
 def tutor(current_user):
+    """
+    Determine if the current user is a tutor
+    """
     cu = Tutee.objects.get(user__username=current_user)
     if cu.is_tutor():
         return True
@@ -346,6 +424,7 @@ def promote_user(request):
     c.update({'tutees': all_tutees})
 
     return render_to_response('promote_user.html', c)
+
 
 def loginerror(request):
     """
