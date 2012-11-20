@@ -8,6 +8,7 @@ from tutor_time.utility import *
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.db import IntegrityError
+from django.views.generic import TemplateView
 
 # If we're testing by simulating emails (ie no SMTP server avaliable)
 try:
@@ -20,31 +21,30 @@ if SIMULATE_EMAIL:
 else:
     from tutor_time.emails import emails
 
-class baseView(object):
-    def renderRequest(request):
-        context = RequestContext(request)
-        context.update(csrf(request))
-        if request.method == 'POST':
-            return self.renderPost(request, context)
-        if request.method == 'GET':
-            return self.renderGet(request, context)
-        return render_to_response('index.html', context)
-
-    def renderPost(request, context):
+class baseView(TemplateView):
+    def post(self, *args, **kwargs):
         pass
 
-    def renderGet(request, context):
+    def get(self, request, *args, **kwargs):
         pass
 
 class emailTuteeView(baseView):
-    @login_required(login_url='/loginerror')
-    def renderPost(request, context):
+
+    def post(self, request, *args, **kwargs):
         """Page to allow a tutor to email their new tutee"""
+        context = RequestContext(request)
+        context.update(csrf(request))
         target = Tutee.objects.get(user__username=request.POST['tutee']).user
         message = request.POST['message']
         emailer = emails()
         emailer.send_email(target, message, "A Message from your Tutor")
         return render_to_response('index.html', context)
+
+#    @login_required(login_url='/loginerror')
+#    def dispatch(self, *args, **kwards):
+#        return super(k
+       
+        
 
 def index(request):
     """Render the default index page"""
@@ -207,8 +207,7 @@ def request_help(request):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
-            if request.POST['specific_request']:
-                print 'roar'
+            if 'specific_request' in request.POST:
                 helprequest.requested = request.POST['requested']
                 helprequest.save()
                 target = Tutee.objects.get(user__username=request.POST['requested']).user
