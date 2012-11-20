@@ -22,7 +22,7 @@ else:
     from tutor_time.emails import emails
 
 class baseView(TemplateView):
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         pass
 
     def get(self, request, *args, **kwargs):
@@ -126,16 +126,20 @@ class logout_view(baseView):
 class claim_tutee(baseView):
 
     def getContext(self, request):
+        """Adds user object and csrf to the context"""
         c = RequestContext(request)
         c.update(csrf(request))
+        return c
+
+    def post(self, request, *args, **kwargs):
+        """
+        Claims a tutee, only accessible for tutors. 
+        """
+        c = self.getContext(request)
         is_tutor = False
         if tutor(c['user'].username):
             is_tutor = True
             c.update({'tutor': is_tutor})
-        return c
-
-    def post(self, request, *args, **kwargs):
-        c = self.getContext(request)
         msg = 'Good news, your request has been accepted by ' +\
                 c['user'].first_name + " " + c['user'].last_name +\
                 ". They should be contacting you directly shortly"
@@ -156,7 +160,16 @@ class claim_tutee(baseView):
         return render_to_response('email_tutee.html', c)
 
     def get(self, request, *args, **kwargs):
+        """
+        Get the list of help requests.
+        Only tutors can claim tutees.
+        Tutors cannot claim themselves
+        """
         c = self.getContext(request) 
+        is_tutor = False
+        if tutor(c['user'].username):
+            is_tutor = True
+            c.update({'tutor': is_tutor})
         tutee_list = Tutee.objects.all()
         requests = Request.objects.all()
         help_requests = []
@@ -173,6 +186,7 @@ class claim_tutee(baseView):
 class request_help(baseView):
 
     def getContext(self, request):
+        """Add information to the context"""
         c = RequestContext(request)
         c.update(csrf(request))
         c.update({
@@ -184,6 +198,9 @@ class request_help(baseView):
         return c
 
     def post(self, request, *args, **kwargs):
+        """
+        Allow a tutee to submit a help request.
+        """
         c = self.getContext(request)
         validate = validate_help_request(request.POST)
         if validate is not None:
@@ -197,6 +214,10 @@ class request_help(baseView):
         t = request.POST['time']
         users_requests = Request.objects.filter(user=c['user'].username)
         valid = True
+        """
+        If the user has ten requests, then they are not able to create a new one.
+        If the user has already requested help for a specific class then they are not able to request help for that class again
+        """
         if len(users_requests) < 11:
             for req in users_requests:
                 if req.for_class == fc:
@@ -210,6 +231,9 @@ class request_help(baseView):
 
         if valid:
             helprequest = Request(user=c['user'].username, first_name=c['user'].first_name, last_name=c['user'].last_name, for_class=fc, description=desc, days=d, time=t)
+            """
+            if a tutor is being specifically requested then they will recieve an email informing them of the request
+            """
             if 'specific_request' in request.POST:
                 helprequest.requested = request.POST['requested']
                 helprequest.save()
@@ -224,12 +248,20 @@ class request_help(baseView):
 
         return render_to_response('request_help.html', c)
     def get(self, request, *args, **kwargs):
+        """
+        Display a page where a user can fill out information to get help.
+        """
         c = self.getContext(request)
         return render_to_response('request_help.html', c)
 
 class profile(baseView):
 
     def get(self, request, *args, **kwargs):
+        """
+        Generates a profile page for the user.
+        For tutees, it displays pending requests, your tutors and what they're tutoring for.
+        If you are tutor, in addition you see your tutees and what you're tutoring them for.
+        """
         c = RequestContext(request)
         c.update(csrf(request))
         if c['user'].is_superuser:
@@ -264,6 +296,7 @@ class profile(baseView):
 class lookup(baseView):
 
     def getContext(self, request):
+        """Add additional information to the context"""
         c = RequestContext(request)
         c.update(csrf(request))
         tutor_list = get_all_tutors(c['user'].username)
@@ -278,24 +311,32 @@ class lookup(baseView):
         return c
 
     def post(self, request, *args, **kwargs):
+        """ Select a specific tutor to ask for help """
         c = self.getContext(request)
         tutor_name = request.POST['choice'].split('^?^')
-        print tutor_name
         c.update({ 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2], 'specific_request': True })
-        print c['specific_request']
         return render_to_response('request_help.html',c)
 
     def get(self, request, *args, **kwargs):
+        """
+        If you are a tutee it displays a list of tutors.
+        If you are a tutor, you also see all the tutees.
+        """
         c = self.getContext(request)
         return render_to_response('lookup.html', c)
 
 def get_all_users(current_user):
-    """gets the tutee object for everyone except the current user"""
+    """
+    gets the tutee object for everyone except the current user
+    """
+
     everyone = Tutee.objects.exclude(user__username=current_user)
     return everyone
 
 def get_all_tutors(current_user):
-    """get all the tutors except current user"""
+    """
+    get all the tutors except current user
+    """
     everyone = get_all_users(current_user)
     tutor_list = []
     for person in everyone:
@@ -304,6 +345,9 @@ def get_all_tutors(current_user):
     return tutor_list
 
 def tutor(current_user):
+    """
+    Determine if the current user is a tutor
+    """
     cu = Tutee.objects.get(user__username=current_user)
     if cu.is_tutor():
         return True
