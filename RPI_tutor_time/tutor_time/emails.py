@@ -30,7 +30,7 @@ class dummy_emails():
 
     def send_email(self, user, msg, subject):
         """
-        Create a dummy email in the manage.py directory
+        Create a dummy email in an email directory in the  manage.py directory
         """
         
         try:
