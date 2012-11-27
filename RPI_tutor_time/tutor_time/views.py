@@ -116,6 +116,12 @@ class create_account(baseView):
 
 class logout_view(baseView):
 
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        c = {}
+        c.update(csrf(request))
+        return render_to_response('index.html',c)
+
     def post(self, request, *args, **kwargs):
         logout(request)
         c = {}
