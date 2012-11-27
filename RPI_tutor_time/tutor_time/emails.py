@@ -1,4 +1,5 @@
 import smtplib
+import os
 from email.mime.text import MIMEText
 
 class emails():
@@ -31,7 +32,13 @@ class dummy_emails():
         """
         Create a dummy email in the manage.py directory
         """
-        f = open(subject.replace(' ','') + '.html','w')
+        
+        try:
+            os.mkdir('emails')
+        except OSError:
+            pass
+
+        f = open('emails/' + subject.replace(' ','') + '.html','w')
         payload = MIMEText(msg)
         payload['From'] = self.ouremail
         payload['To'] = user.email
