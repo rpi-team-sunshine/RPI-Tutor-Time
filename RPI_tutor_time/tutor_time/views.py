@@ -10,6 +10,8 @@ from django.http import Http404
 from django.db import IntegrityError
 from django.views.generic import TemplateView
 
+import glob
+
 # If we're testing by simulating emails (ie no SMTP server avaliable)
 try:
     from settings import SIMULATE_EMAIL
@@ -444,3 +446,17 @@ def loginerror(request):
     c.update(csrf(request))
     c.update({'message': 'Please log in to view the page', 'error': True})
     return render_to_response('display_message.html', c)
+
+class show_emails(baseView):
+    def get(self, request, *args, **kwargs):
+        context = RequestContext(request) 
+        context.update(csrf(request))
+        if len(args) != 0:
+          f = open('emails/'+args[0],'r')
+          content = f.read()
+          f.close()
+          context.update({'email': content}) 
+          return render_to_response('emails.html', context)
+        files = glob.glob('emails/*')
+        context.update({'emails': files})
+        return render_to_response('emails.html', context)

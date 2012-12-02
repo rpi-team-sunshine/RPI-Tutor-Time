@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+
+{% block title %}
+Emails
+{% endblock %}
+
+{% block content %}
+  <ol>
+  {% for email in emails %}
+    <li><a href="/{{ email }}">{{ email }}</a></li>
+  {% empty %}
+    {{ email }}
+  {% endfor %}
+  </ol>
+{% endblock %}

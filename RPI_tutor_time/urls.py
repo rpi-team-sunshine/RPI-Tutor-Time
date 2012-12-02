@@ -29,6 +29,8 @@ urlpatterns = patterns('',
     url(r'^login/', django.contrib.auth.views.login, {'template_name': 'display_message.html', 'extra_context': {'message': 'Invalid user name or password', 'error': True}}),
     url(r'^logout/', tutor_time.views.logout_view.as_view()),
     url(r'^verify_account/([0-9a-z]+)', tutor_time.views.verify_account),
+    url(r'^emails/([A-Za-z]+\.html)', tutor_time.views.show_emails.as_view()),
+    url(r'^emails/', tutor_time.views.show_emails.as_view()),
     url(r'^$', tutor_time.views.index.as_view()),
 
     # Uncomment the next line to enable the admin:
