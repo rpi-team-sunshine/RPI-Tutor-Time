@@ -200,6 +200,8 @@ class request_help(baseView):
             'description_error': '',
             'day_error': '',
             'time_error': '',
+            'times': range(1,24),
+            'days': ['Mon','Tues','Wed','Thurs','Fri','Sat','Sun']
             })
         return c
 

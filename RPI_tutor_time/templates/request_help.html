@@ -27,7 +27,22 @@ Request Help
             <span class="errortext">{{ description_error }}</span>
         <p>
         <p>
-            <label> Day: </label> <input name="day" type="text"/> <label> Time: </label> <input name="time" type="text">
+            <label> Day: </label> 
+              <select name="day">
+                {% for day in days%}
+                <option value="{{ day }}">{{ day }}</option>
+                {% endfor %}
+              </select>
+            <label> Time: </label> 
+              <select name="time">
+                {% for time in times %}
+                {% if time == 12 %}
+                <option value="{{ time }}:00" selected="selected">{{ time }}:00</option>
+                {% else %}
+                <option value="{{ time }}:00">{{ time }}:00</option>
+                {% endif %}
+                {% endfor %}
+              </select>
         </p>
         <p>
             <span class="errortext">{{ day_error }}</span>
