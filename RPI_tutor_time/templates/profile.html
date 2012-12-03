@@ -12,6 +12,7 @@
                 <p><li> Class: {{ req.for_class }}</li></p>
                 <p><label> Description: </label><label>{{ req.description }}</label></p>
                 <p><label> Availability: </label><label>{{ req.days }} {{ req.time }}</label></p>
+                <br />
             {% empty %}
                 <li>You have no pending requests</li>
             {% endfor %}
@@ -23,6 +24,7 @@
                 <p><li>{{ tutor.0.user.first_name }} {{ tutor.0.user.last_name }}</li></p>
                 <p><label>{{ tutor.0.user.email }}</label></p>
                 <p><label>For: {{ tutor.1.for_class }}</label></p> 
+                <br />
             {% empty %}
                 <li>You have no tutors</li>
             {% endfor %}
@@ -34,6 +36,7 @@
                     <p><li>{{ tutee.0.user.first_name }} {{tutee.0.user.last_name }}</li></p>
                     <p><label>{{ tutee.0.user.email }}</label></p>
                     <p><label>{{ tutee.1.for_class }}
+                    <br />
                 {% empty %}
                     <p><li>You have no tutees</li></p>
                 {% endfor %}

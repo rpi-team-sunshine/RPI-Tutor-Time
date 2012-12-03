@@ -40,7 +40,11 @@ class emailTuteeView(baseView):
         message = request.POST['message']
         emailer = emails()
         emailer.send_email(target, message, "A Message from your Tutor")
-        return render_to_response('index.html', context)
+        context.update({
+          'error': False,
+          'message': 'Email successfully sent!'
+        })
+        return render_to_response('display_message.html', context)
 
        
 class index(baseView): 
@@ -325,6 +329,10 @@ class lookup(baseView):
         c = self.getContext(request)
         tutor_name = request.POST['choice'].split('^?^')
         c.update({ 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2], 'specific_request': True })
+        c.update({ 
+            'times': range(1,24),
+            'days': ['Mon','Tues','Wed','Thurs','Fri','Sat','Sun']
+        })
         return render_to_response('request_help.html',c)
 
     def get(self, request, *args, **kwargs):

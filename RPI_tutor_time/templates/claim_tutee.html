@@ -16,10 +16,15 @@ Claim Tutee
                 <p><label> Availability: </label><label>{{ req.days }} {{ req.time }}</label></p>
                 <p><input type="radio" name="choice" id="{{ req.user }}?^?{{ req.id }}" value="{{ req.user }}?^?{{ req.id }}" />
                 <label for="{{ req.user }}">Claim This Tutee</label></p>
+                <hr />
             {% empty %}
                 <li>There are no tutees in the list</li>
             {% endfor %}
-            <input type="submit" value="Submit" />
+
+            {% if help_requests %}
+              <input type="submit" value="Submit" />
+            {% endif %}
+
         </form>
     </fieldset>
 {% endif %}
