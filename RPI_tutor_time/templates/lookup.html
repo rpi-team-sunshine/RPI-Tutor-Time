@@ -12,6 +12,7 @@
                 <p><li>{{ tutor.user.first_name }} {{ tutor.user.last_name }}</li></p>
                 <p><label>{{ tutor.user.email }}</label></p>
                 <p><input type="radio" name="choice" value="{{ tutor.user.first_name }}^?^{{ tutor.user.last_name }}^?^{{ tutor.user.username }}">Request this tutor</label></p>
+                <br />
             {% empty %}
                 <p><li>There are no available tutors</li></p>
             {% endfor %}
@@ -24,6 +25,7 @@
                 {% for tutee in tutee_list %}
                     <p><li>{{ tutee.user.first_name }} {{ tutee.user.last_name }}</li></p>
                     <p><label>{{ tutee.user.email }}</label></p>
+                    <br />
                 {% empty %}
                     <p><li>There are no tutees</li></p>
                 {% endfor %}

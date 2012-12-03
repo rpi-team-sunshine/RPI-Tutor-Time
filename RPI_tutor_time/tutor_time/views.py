@@ -259,6 +259,11 @@ class request_help(baseView):
                 emailer.send_email(target, message, 'Tutor Request')
             else:
                 helprequest.save()
+            c.update({
+              'error': False,
+              'message': 'Request successfully submitted.'
+            })
+            return render_to_response('display_message.html', c)
 
         return render_to_response('request_help.html', c)
     def get(self, request, *args, **kwargs):
@@ -327,6 +332,12 @@ class lookup(baseView):
     def post(self, request, *args, **kwargs):
         """ Select a specific tutor to ask for help """
         c = self.getContext(request)
+        if 'choice' not in request.POST:
+          c.update({
+              'error': True,
+              'message': 'No one was selected'
+          })
+          return render_to_response('display_message.html', c)
         tutor_name = request.POST['choice'].split('^?^')
         c.update({ 'firstname': tutor_name[0], 'lastname': tutor_name[1], 'username': tutor_name[2], 'specific_request': True })
         c.update({ 
